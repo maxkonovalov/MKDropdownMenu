@@ -1,0 +1,6 @@
+framework module MKDropdownMenu {
+  umbrella header "MKDropdownMenu-umbrella.h"
+
+  export *
+  module * { export * }
+}

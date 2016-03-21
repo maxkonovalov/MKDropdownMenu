@@ -1,6 +1,5 @@
 # MKDropdownMenu
 
-
 Dropdown Menu for iOS with many customizable parameters to suit any needs.
 
 Inspired by UIPickerView.
@@ -9,6 +8,14 @@ Inspired by UIPickerView.
 <img src="Screenshots/MKDropdownMenu.gif?raw=true" alt="MKDropdownMenu" width=320>
 
 ## Installation
+### CocoaPods
+
+`MKDropdownMenu` is available through [CocoaPods](http://cocoapods.org). To install
+it, simply add the following line to your Podfile:
+
+```ruby
+pod 'MKDropdownMenu'
+```
 
 ### Manually
 
