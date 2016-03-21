@@ -1,0 +1,4 @@
+language: objective-c
+xcode_workspace: Example/MKDropdownMenuExample.xcworkspace
+xcode_scheme: MKDropdownMenuExample
+#podfile: Example/Podfile
