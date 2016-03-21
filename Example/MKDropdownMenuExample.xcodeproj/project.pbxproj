@@ -18,11 +18,10 @@
 		509868651C9B79EF00F7F45A /* ShapeSelectView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 509868641C9B79EF00F7F45A /* ShapeSelectView.xib */; };
 		509868681C9B821000F7F45A /* LineWidthSelectView.m in Sources */ = {isa = PBXBuildFile; fileRef = 509868671C9B821000F7F45A /* LineWidthSelectView.m */; };
 		50B18C571C9C536100F9E7FB /* ChildViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 50B18C561C9C536100F9E7FB /* ChildViewController.m */; };
-		630367DDBBFB827CD12F996F /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A6EC53A103490DB0A29DC50 /* Pods.framework */; };
+		50C417771CA05F8200AB271B /* MKDropdownMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = 50C417761CA05F8200AB271B /* MKDropdownMenu.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		144E63E914FB587FF56E9BB8 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		5098683A1C9B31AF00F7F45A /* MKDropdownMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MKDropdownMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5098683E1C9B31AF00F7F45A /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		509868401C9B31AF00F7F45A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -43,8 +42,8 @@
 		509868671C9B821000F7F45A /* LineWidthSelectView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineWidthSelectView.m; sourceTree = "<group>"; };
 		50B18C551C9C536100F9E7FB /* ChildViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChildViewController.h; sourceTree = "<group>"; };
 		50B18C561C9C536100F9E7FB /* ChildViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChildViewController.m; sourceTree = "<group>"; };
-		9A6EC53A103490DB0A29DC50 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B52AE863DA87CA3FC9637AC7 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		50C417751CA05F8200AB271B /* MKDropdownMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKDropdownMenu.h; sourceTree = "<group>"; };
+		50C417761CA05F8200AB271B /* MKDropdownMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKDropdownMenu.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,28 +51,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				630367DDBBFB827CD12F996F /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2C74E639489698B48CEBBD43 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				9A6EC53A103490DB0A29DC50 /* Pods.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		509868311C9B31AF00F7F45A = {
 			isa = PBXGroup;
 			children = (
+				50C417741CA05F8200AB271B /* MKDropdownMenu */,
 				5098683C1C9B31AF00F7F45A /* MKDropdownMenuExample */,
 				5098683B1C9B31AF00F7F45A /* Products */,
-				80A4185A7F086FE6C9256B7D /* Pods */,
-				2C74E639489698B48CEBBD43 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,13 +116,14 @@
 			name = Views;
 			sourceTree = "<group>";
 		};
-		80A4185A7F086FE6C9256B7D /* Pods */ = {
+		50C417741CA05F8200AB271B /* MKDropdownMenu */ = {
 			isa = PBXGroup;
 			children = (
-				B52AE863DA87CA3FC9637AC7 /* Pods.debug.xcconfig */,
-				144E63E914FB587FF56E9BB8 /* Pods.release.xcconfig */,
+				50C417751CA05F8200AB271B /* MKDropdownMenu.h */,
+				50C417761CA05F8200AB271B /* MKDropdownMenu.m */,
 			);
-			name = Pods;
+			name = MKDropdownMenu;
+			path = ../MKDropdownMenu;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,12 +133,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 509868511C9B31AF00F7F45A /* Build configuration list for PBXNativeTarget "MKDropdownMenu" */;
 			buildPhases = (
-				0BEB715675B4F281BA216462 /* Check Pods Manifest.lock */,
 				509868361C9B31AF00F7F45A /* Sources */,
 				509868371C9B31AF00F7F45A /* Frameworks */,
 				509868381C9B31AF00F7F45A /* Resources */,
-				BF2478D672127C8DC11A88AC /* Embed Pods Frameworks */,
-				61690D41DA5FE0071D6C6E5D /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -205,54 +192,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		0BEB715675B4F281BA216462 /* Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		61690D41DA5FE0071D6C6E5D /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		BF2478D672127C8DC11A88AC /* Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		509868361C9B31AF00F7F45A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -263,6 +202,7 @@
 				50B18C571C9C536100F9E7FB /* ChildViewController.m in Sources */,
 				5098685F1C9B6FC100F7F45A /* ShapeView.m in Sources */,
 				509868681C9B821000F7F45A /* LineWidthSelectView.m in Sources */,
+				50C417771CA05F8200AB271B /* MKDropdownMenu.m in Sources */,
 				509868421C9B31AF00F7F45A /* AppDelegate.m in Sources */,
 				5098683F1C9B31AF00F7F45A /* main.m in Sources */,
 			);
@@ -372,7 +312,6 @@
 		};
 		509868521C9B31AF00F7F45A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B52AE863DA87CA3FC9637AC7 /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MKDropdownMenuExample/Info.plist;
@@ -385,7 +324,6 @@
 		};
 		509868531C9B31AF00F7F45A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 144E63E914FB587FF56E9BB8 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = MKDropdownMenuExample/Info.plist;
