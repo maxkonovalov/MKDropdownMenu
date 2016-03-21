@@ -2,4 +2,6 @@ language: objective-c
 xcode_workspace: Example/MKDropdownMenuExample.xcworkspace
 xcode_scheme: MKDropdownMenuExample
 xcode_sdk: iphonesimulator8.1
-#podfile: Example/Podfile
+before_script:
+  - brew update
+  - brew upgrade xctool
