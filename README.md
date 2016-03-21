@@ -1,5 +1,10 @@
 # MKDropdownMenu
 
+[![Build Status](https://travis-ci.org/maxkonovalov/MKDropdownMenu.svg?branch=master&style=flat)](https://travis-ci.org/maxkonovalov/MKDropdownMenu)
+[![Version](https://img.shields.io/cocoapods/v/MKDropdownMenu.svg?style=flat)](http://cocoapods.org/pods/MKDropdownMenu)
+[![License](https://img.shields.io/cocoapods/l/MKDropdownMenu.svg?style=flat)](http://cocoapods.org/pods/MKDropdownMenu)
+[![Platform](https://img.shields.io/cocoapods/p/MKDropdownMenu.svg?style=flat)](http://cocoapods.org/pods/MKDropdownMenu)
+
 Dropdown Menu for iOS with many customizable parameters to suit any needs.
 
 Inspired by UIPickerView.
