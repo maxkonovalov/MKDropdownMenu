@@ -977,7 +977,7 @@ static UIImage *disclosureIndicatorImage = nil;
         defaultWidth = (self.bounds.size.width - totalCustomWidth) / (self.buttons.count - customWidthsCount);
     }
     
-    NSAssert(totalCustomWidth < self.bounds.size.width, @"total width for components (%.1f) must not be greater than view bounds width (%.1f)", totalCustomWidth, self.bounds.size.width);
+    NSAssert(totalCustomWidth <= self.bounds.size.width, @"total width for components (%.1f) must not be greater than view bounds width (%.1f)", totalCustomWidth, self.bounds.size.width);
     
     __block CGFloat dx = 0;
     [self.buttons enumerateObjectsUsingBlock:^(MKDropdownMenuComponentButton *btn, NSUInteger idx, BOOL *stop) {
