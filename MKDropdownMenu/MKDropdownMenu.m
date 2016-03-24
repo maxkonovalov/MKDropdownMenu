@@ -294,6 +294,7 @@ static UIImage *disclosureIndicatorImage = nil;
 - (UIView *)accessoryViewForRow:(NSInteger)row;
 - (UIColor *)backgroundColorForRow:(NSInteger)row;
 - (void)didSelectRow:(NSInteger)row;
+- (void)willDisappear;
 @end
 
 #pragma mark Controller
@@ -532,6 +533,11 @@ static UIImage *disclosureIndicatorImage = nil;
     [super viewWillAppear:animated];
     [self updateData];
     self.tableView.contentOffset = CGPointZero;
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self.delegate willDisappear];
 }
 
 - (void)updateData {
@@ -1213,33 +1219,30 @@ static UIImage *disclosureIndicatorImage = nil;
     NSAssert(component >= 0 && component < self.components.count, @"invalid component: %zd", component);
     
     NSInteger previousComponent = self.selectedComponent;
-    self.selectedComponent = component;
+    
+    void (^presentation)() = ^{
+        self.selectedComponent = component;
+        [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
+        if (component != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didOpenComponent:)]) {
+            [self.delegate dropdownMenu:self didOpenComponent:component];
+        }
+    };
     
     if (previousComponent != -1) {
         [self dismissDropdownAnimated:animated completion:^{
-            [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
-            if (component != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didOpenComponent:)]) {
-                [self.delegate dropdownMenu:self didOpenComponent:component];
-            }
+            presentation();
         }];
         if ([self.delegate respondsToSelector:@selector(dropdownMenu:didCloseComponent:)]) {
             [self.delegate dropdownMenu:self didCloseComponent:previousComponent];
         }
     } else {
-        [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
-        if (component != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didOpenComponent:)]) {
-            [self.delegate dropdownMenu:self didOpenComponent:component];
-        }
+        presentation();
     }
 }
 
 - (void)closeAllComponentsAnimated:(BOOL)animated {
-    NSInteger previousComponent = self.selectedComponent;
-    self.selectedComponent = -1;
     [self dismissDropdownAnimated:animated completion:nil];
-    if (previousComponent != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didCloseComponent:)]) {
-        [self.delegate dropdownMenu:self didCloseComponent:previousComponent];
-    }
+    [self cleanupSelectedComponents];
 }
 
 #pragma mark - Private
@@ -1290,6 +1293,36 @@ static UIImage *disclosureIndicatorImage = nil;
     return UIEdgeInsetsMake(0, left, 0, CGRectGetWidth(presentingView.bounds) - right);
 }
 
+- (void)cleanupSelectedComponents {
+    NSInteger previousComponent = self.selectedComponent;
+    self.selectedComponent = -1;
+    if (previousComponent != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didCloseComponent:)]) {
+        [self.delegate dropdownMenu:self didCloseComponent:previousComponent];
+    }
+}
+
+- (void)updateComponentButtonsSelection:(BOOL)selected {
+    void (^animation)() = ^{
+        if (selected) {
+            [self.buttons[self.selectedComponent] setSelected:YES];
+        } else {
+            [self.buttons enumerateObjectsUsingBlock:^(MKDropdownMenuComponentButton *btn, NSUInteger idx, BOOL *stop) {
+                [btn setSelected:NO];
+            }];
+        }
+    };
+    
+    if (self.contentViewController.transitionCoordinator != nil) {
+        [self.contentViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+            animation();
+        } completion:nil];
+    } else {
+        [UIView animateWithDuration:kAnimationDuration animations:^{
+            animation();
+        }];
+    }
+}
+
 #pragma mark - Dropdown Presenting & Dismissing
 
 - (UIViewController *)presentingViewController {
@@ -1333,9 +1366,7 @@ static UIImage *disclosureIndicatorImage = nil;
             completion();
         }
     }];
-    [self.contentViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self.buttons[self.selectedComponent] setSelected:YES];
-    } completion:nil];
+    [self updateComponentButtonsSelection:YES];
 }
 
 - (void)dismissDropdownAnimated:(BOOL)animated completion:(void (^)())completion {
@@ -1352,11 +1383,7 @@ static UIImage *disclosureIndicatorImage = nil;
             completion();
         }
     }];
-    [self.contentViewController.transitionCoordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self.buttons enumerateObjectsUsingBlock:^(MKDropdownMenuComponentButton *btn, NSUInteger idx, BOOL *stop) {
-            btn.selected = NO;
-        }];
-    } completion:nil];
+    [self updateComponentButtonsSelection:NO];
 }
 
 #pragma mark UIViewControllerTransitioningDelegate
@@ -1447,6 +1474,13 @@ static UIImage *disclosureIndicatorImage = nil;
         [self selectedComponent:nil];
     } else if ([self.delegate respondsToSelector:@selector(dropdownMenu:didSelectRow:inComponent:)]) {
         [self.delegate dropdownMenu:self didSelectRow:row inComponent:self.selectedComponent];
+    }
+}
+
+- (void)willDisappear {
+    if (self.selectedComponent != -1) {
+        [self cleanupSelectedComponents];
+        [self updateComponentButtonsSelection:NO];
     }
 }
 
