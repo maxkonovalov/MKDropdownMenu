@@ -317,7 +317,7 @@ static UIImage *disclosureIndicatorImage = nil;
 @property (assign, nonatomic) UIOffset separatorViewOffset;
 @property (assign, nonatomic) BOOL showsTopRowSeparator;
 
-@property (assign, nonatomic) UIColor *highlightColor;
+@property (strong, nonatomic) UIColor *highlightColor;
 
 @property (assign, nonatomic) UIEdgeInsets contentInset;
 
