@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "MKDropdownMenu"
-  s.version          = "1.0"
+  s.version          = "1.0.1"
   s.summary          = "Dropdown Menu for iOS"
   s.description      = <<-DESC
 Dropdown Menu for iOS with many customizable parameters to suit any needs.
@@ -15,5 +15,5 @@ Dropdown Menu for iOS with many customizable parameters to suit any needs.
   s.platform     = :ios, '8.0'
   s.requires_arc = true
 
-  s.source_files = 'MKDropdownMenu/**/*'
+  s.source_files = 'MKDropdownMenu/*'
 end
