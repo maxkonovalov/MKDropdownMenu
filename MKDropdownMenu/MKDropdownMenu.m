@@ -189,6 +189,11 @@ static UIImage *disclosureIndicatorImage = nil;
     self.backgroundColor = selected ? self.selectedBackgroundColor : nil;
 }
 
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    self.disclosureIndicatorView.hidden = !enabled;
+}
+
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
     UIView *targetView = [super hitTest:point withEvent:event];
     if (CGRectContainsPoint(self.bounds, point) && ![targetView isKindOfClass:[UIControl class]]) {
@@ -883,6 +888,12 @@ static UIImage *disclosureIndicatorImage = nil;
 }
 
 - (void)updateButton:(MKDropdownMenuComponentButton *)button forComponent:(NSInteger)component {
+    BOOL enabled = YES;
+    if ([self.delegate respondsToSelector:@selector(dropdownMenu:enableComponent:)]) {
+        enabled = [self.delegate dropdownMenu:self enableComponent:component];
+    }
+    [button setEnabled:enabled];
+    
     [button setTextAlignment:self.componentTextAlignment];
     [button setDisclosureIndicatorImage:self.disclosureIndicatorImage];
     [button setSelectedBackgroundColor:self.selectedComponentBackgroundColor];

@@ -162,6 +162,10 @@ NS_ASSUME_NONNULL_BEGIN
 // return the background color for the highlighted rows in component
 - (nullable UIColor *)dropdownMenu:(MKDropdownMenu *)dropdownMenu backgroundColorForHighlightedRowsInComponent:(NSInteger)component;
 
+// return NO if the component is used as a dummy space for other components and should not be interacted with.
+// the disclosure indicator is hidden for such components
+- (BOOL)dropdownMenu:(MKDropdownMenu *)dropdownMenu enableComponent:(NSInteger)component; // default = YES
+
 
 // called when a row was tapped. if selection needs to be handled, use `-(de)selectRow:inComponent:` as appropriate
 - (void)dropdownMenu:(MKDropdownMenu *)dropdownMenu didSelectRow:(NSInteger)row inComponent:(NSInteger)component;
