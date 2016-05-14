@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "MKDropdownMenu"
-  s.version          = "1.0.1"
+  s.version          = "1.1"
   s.summary          = "Dropdown Menu for iOS"
   s.description      = <<-DESC
 Dropdown Menu for iOS with many customizable parameters to suit any needs.
