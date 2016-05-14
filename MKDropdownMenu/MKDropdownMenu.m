@@ -341,8 +341,7 @@ static UIImage *disclosureIndicatorImage = nil;
 
 @implementation MKDropdownMenuContentViewController
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         
@@ -358,6 +357,7 @@ static UIImage *disclosureIndicatorImage = nil;
     [super viewDidLoad];
     
     self.view.backgroundColor = [UIColor colorWithWhite:0.0 alpha:kDefaultBackgroundDimmingOpacity];
+    self.view.clipsToBounds = YES;
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
     tap.delegate = self;
@@ -685,93 +685,171 @@ static UIImage *disclosureIndicatorImage = nil;
 
 
 
-#pragma mark - Transitions -
+#pragma mark - Transition -
 
-#pragma mark Presenting
+static const CGFloat kScrollViewBottomSpace = 5;
 
-@interface MKDropdownMenuPresentTransition : NSObject <UIViewControllerAnimatedTransitioning>
+@interface MKDropdownMenuTransition : NSObject {
+    CGFloat _previousScrollViewBottomInset;
+}
 @property (assign, nonatomic) NSTimeInterval duration;
-@property (assign, nonatomic) CGFloat topOffset;
+@property (readonly, nonatomic) BOOL isAnimating;
+@property (weak, nonatomic) MKDropdownMenu *menu;
+@property (weak, nonatomic) MKDropdownMenuContentViewController *controller;
+@property (weak, nonatomic) UIView *containerView;
 @end
 
-@implementation MKDropdownMenuPresentTransition
+@implementation MKDropdownMenuTransition
 
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return self.duration;
+- (instancetype)initWithDropdownMenu:(MKDropdownMenu *)menu
+               contentViewController:(MKDropdownMenuContentViewController *)controller {
+    self = [super init];
+    if (self) {
+        self.menu = menu;
+        self.controller = controller;
+        self.duration = kAnimationDuration;
+        _previousScrollViewBottomInset = CGFLOAT_MAX;
+    }
+    return self;
 }
 
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    UIView *containerView = [transitionContext containerView];
-    containerView.clipsToBounds = YES;
-    containerView.backgroundColor = [UIColor clearColor];
-    containerView.frame = CGRectMake(0, self.topOffset,
-                                     containerView.bounds.size.width, containerView.bounds.size.height - self.topOffset);
+- (void)presentDropdownInContainerView:(UIView *)containerView animated:(BOOL)animated completion:(void (^)())completion {
     
-    MKDropdownMenuContentViewController *toVC = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
-    UIView *toView = [transitionContext viewForKey:UITransitionContextToViewKey];
-    toView.frame = containerView.bounds;
-    [containerView addSubview:toView];
+    self.containerView = containerView;
     
-    [toView layoutIfNeeded];
+    [self.controller beginAppearanceTransition:YES animated:animated];
+    
+    CGRect frame = [containerView convertRect:self.menu.bounds fromView:self.menu];
+    CGFloat topOffset = CGRectGetMaxY(frame);
+    CGFloat height = CGRectGetHeight(containerView.bounds);
+    
+    void (^scrollViewAdjustBlock)() = ^{};
+    
+    if ([containerView isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)containerView;
+        
+        CGFloat contentHeight = self.controller.contentHeight;
+        CGFloat contentMaxY = topOffset + contentHeight + kScrollViewBottomSpace;
+        
+        CGFloat inset = contentMaxY - scrollView.contentSize.height - scrollView.contentInset.bottom;
+        CGFloat offset = contentMaxY - scrollView.bounds.size.height;
+        
+        height = MAX(height - scrollView.contentInset.top, scrollView.contentSize.height + scrollView.contentInset.bottom);
+        
+        if (_menu.adjustsContentInset) {
+            height = MAX(height, contentMaxY);
+        }
+        
+        scrollViewAdjustBlock = ^{
+            if (_menu.adjustsContentInset && inset > 0) {
+                _previousScrollViewBottomInset = scrollView.contentInset.bottom;
+                UIEdgeInsets contentInset = scrollView.contentInset;
+                contentInset.bottom += inset;
+                scrollView.contentInset = contentInset;
+            }
+            if (_menu.adjustsContentOffset && scrollView.contentOffset.y < offset) {
+                scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, offset);
+            }
+        };
+    }
+    
+    self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), topOffset,
+                                            CGRectGetWidth(containerView.bounds), height - topOffset);
+    
+    [containerView addSubview:self.controller.view];
+    [self.controller.view layoutIfNeeded];
+    
+    if (!animated) {
+        scrollViewAdjustBlock();
+        [self.controller endAppearanceTransition];
+        if (completion) {
+            completion();
+        }
+        return;
+    }
     
     CGAffineTransform t = CGAffineTransformMakeScale(1.0, 0.5);
-    t = CGAffineTransformTranslate(t, 0, -CGRectGetHeight(toVC.containerView.frame));
-    toVC.containerView.transform = t;
+    t = CGAffineTransformTranslate(t, 0, -2 * CGRectGetHeight(self.controller.containerView.frame));
+    self.controller.containerView.transform = t;
     
-    toView.alpha = 0.0;
+    self.controller.view.alpha = 0.0;
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext]
+    _isAnimating = YES;
+    
+    [UIView animateWithDuration:self.duration
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:0.0
                         options:kNilOptions
                      animations:^{
-                         toView.alpha = 1.0;
-                         toVC.containerView.transform = CGAffineTransformIdentity;
+                         self.controller.view.alpha = 1.0;
+                         self.controller.containerView.transform = CGAffineTransformIdentity;
+                         scrollViewAdjustBlock();
                      }
                      completion:^(BOOL finished) {
-                         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
+                         [self.controller endAppearanceTransition];
+                         _isAnimating = NO;
+                         if (completion) {
+                             completion();
+                         }
                      }];
 }
 
-@end
-
-#pragma mark Dismissing
-
-@interface MKDropdownMenuDismissTransition : NSObject <UIViewControllerAnimatedTransitioning>
-@property (assign, nonatomic) NSTimeInterval duration;
-@end
-
-@implementation MKDropdownMenuDismissTransition
-
-- (NSTimeInterval)transitionDuration:(id<UIViewControllerContextTransitioning>)transitionContext {
-    return self.duration;
-}
-
-- (void)animateTransition:(id<UIViewControllerContextTransitioning>)transitionContext {
-    UIView *containerView = [transitionContext containerView];
-    containerView.clipsToBounds = YES;
+- (void)dismissDropdownAnimated:(BOOL)animated completion:(void (^)())completion {
     
-    MKDropdownMenuContentViewController *fromVC = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
-    UIView *fromView = [transitionContext viewForKey:UITransitionContextFromViewKey];
+    [self.controller beginAppearanceTransition:NO animated:animated];
+    
+    void (^scrollViewResetBlock)() = ^{};
+    
+    if ([self.containerView isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)self.containerView;
+        scrollViewResetBlock = ^{
+            if (_previousScrollViewBottomInset != CGFLOAT_MAX) {
+                UIEdgeInsets contentInset = scrollView.contentInset;
+                contentInset.bottom = _previousScrollViewBottomInset;
+                scrollView.contentInset = contentInset;
+                _previousScrollViewBottomInset = CGFLOAT_MAX;
+            }
+        };
+    }
+    
+    if (!animated) {
+        scrollViewResetBlock();
+        [self.controller.view removeFromSuperview];
+        [self.controller endAppearanceTransition];
+        if (completion) {
+            completion();
+        }
+        return;
+    }
     
     CGAffineTransform t = CGAffineTransformMakeScale(1.0, 0.5);
-    t = CGAffineTransformTranslate(t, 0, -CGRectGetHeight(fromVC.containerView.frame));
+    t = CGAffineTransformTranslate(t, 0, -2 * CGRectGetHeight(self.controller.containerView.frame));
     
-    [UIView animateWithDuration:[self transitionDuration:transitionContext]
+    _isAnimating = YES;
+    
+    [UIView animateWithDuration:self.duration
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:0.0
                         options:kNilOptions
                      animations:^{
-                         fromView.alpha = 0.0;
-                         fromVC.containerView.transform = t;
+                         self.controller.view.alpha = 0.0;
+                         self.controller.containerView.transform = t;
+                         scrollViewResetBlock();
                      }
                      completion:^(BOOL finished) {
-                         [transitionContext completeTransition:![transitionContext transitionWasCancelled]];
-                         fromView.alpha = 1.0;
-                         fromVC.containerView.transform = CGAffineTransformIdentity;
+                         [self.controller.view removeFromSuperview];
+                         self.controller.view.alpha = 1.0;
+                         self.controller.containerView.transform = CGAffineTransformIdentity;
+                         [self.controller endAppearanceTransition];
+                         _isAnimating = NO;
+                         if (completion) {
+                             completion();
+                         }
                      }];
+    
+    self.containerView = nil;
 }
 
 @end
@@ -781,10 +859,9 @@ static UIImage *disclosureIndicatorImage = nil;
 
 #pragma mark - Dropdown Menu -
 
-@interface MKDropdownMenu () <MKDropdownMenuContentViewControllerDelegate, UIViewControllerTransitioningDelegate> {
-    MKDropdownMenuPresentTransition *_presentTransition;
-    MKDropdownMenuDismissTransition *_dismissTransition;
-}
+@interface MKDropdownMenu () <MKDropdownMenuContentViewControllerDelegate>
+
+@property (strong, nonatomic) MKDropdownMenuTransition *transition;
 
 @property (strong, nonatomic) MKDropdownMenuContentViewController *contentViewController;
 @property (strong, nonatomic) NSMutableArray<MKDropdownMenuComponentButton *> *buttons;
@@ -818,19 +895,20 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (void)setup {
     self.contentViewController = [MKDropdownMenuContentViewController new];
-    self.contentViewController.modalPresentationStyle = UIModalPresentationCustom;
-    self.contentViewController.transitioningDelegate = self;
     self.contentViewController.delegate = self;
     
     // load content view
     [self.contentViewController view];
     
-    _presentTransition = [MKDropdownMenuPresentTransition new];
-    _dismissTransition = [MKDropdownMenuDismissTransition new];
+    self.transition = [[MKDropdownMenuTransition alloc] initWithDropdownMenu:self
+                                                       contentViewController:self.contentViewController];
     
     _selectedComponent = -1;
     
     _componentTextAlignment = NSTextAlignmentCenter;
+    
+    _adjustsContentInset = YES;
+    _adjustsContentOffset = NO;
     
     self.components = [NSMutableArray new];
     self.selectedRows = [NSMutableArray new];
@@ -1052,13 +1130,15 @@ static UIImage *disclosureIndicatorImage = nil;
 }
 
 - (void)setBackgroundDimmingOpacity:(CGFloat)backgroundDimmingOpacity {
-    self.contentViewController.view.backgroundColor = [UIColor colorWithWhite:0.0 alpha:backgroundDimmingOpacity];
+    self.contentViewController.view.backgroundColor = [UIColor colorWithWhite:(backgroundDimmingOpacity < 0 ? 1.0 : 0.0)
+                                                                        alpha:fabs(backgroundDimmingOpacity)];
 }
 
 - (CGFloat)backgroundDimmingOpacity {
-    CGFloat *alpha = nil;
-    [self.contentViewController.view.backgroundColor getWhite:nil alpha:alpha];
-    return (*alpha);
+    CGFloat white = 0.0;
+    CGFloat alpha = 0.0;
+    [self.contentViewController.view.backgroundColor getWhite:&white alpha:&alpha];
+    return (white == 1.0 ? -alpha : alpha);
 }
 
 - (void)setComponentSeparatorColor:(UIColor *)componentSeparatorColor {
@@ -1256,9 +1336,16 @@ static UIImage *disclosureIndicatorImage = nil;
     [self cleanupSelectedComponents];
 }
 
+- (void)bringDropdownViewToFront {
+    [self.contentViewController.view.superview bringSubviewToFront:self.contentViewController.view];
+}
+
 #pragma mark - Private
 
 - (void)selectedComponent:(MKDropdownMenuComponentButton *)sender {
+    if (self.transition.isAnimating) {
+        return;
+    }
     if (sender == nil) {
         [self closeAllComponentsAnimated:YES];
     } else {
@@ -1276,8 +1363,7 @@ static UIImage *disclosureIndicatorImage = nil;
         return UIEdgeInsetsZero;
     }
     
-    UIViewController *presentingViewController = [self presentingViewController];
-    UIView *presentingView = presentingViewController.view.window;
+    UIView *presentingView = [self containerView];
     
     BOOL fullWidth = YES;
     if ([self.delegate respondsToSelector:@selector(dropdownMenu:shouldUseFullRowWidthForComponent:)]) {
@@ -1301,7 +1387,7 @@ static UIImage *disclosureIndicatorImage = nil;
         right = CGRectGetMaxX(buttonFrame);
     }
     
-    return UIEdgeInsetsMake(0, left, 0, CGRectGetWidth(presentingView.bounds) - right);
+    return UIEdgeInsetsMake(0, left, 0, CGRectGetWidth(presentingView.bounds) - right + 0.5);
 }
 
 - (void)cleanupSelectedComponents {
@@ -1336,12 +1422,8 @@ static UIImage *disclosureIndicatorImage = nil;
 
 #pragma mark - Dropdown Presenting & Dismissing
 
-- (UIViewController *)presentingViewController {
-    UIViewController *presentingViewController = self.window.rootViewController;
-    while (presentingViewController.presentedViewController != nil) {
-        presentingViewController = presentingViewController.presentedViewController;
-    }
-    return presentingViewController;
+- (UIView *)containerView {
+    return self.presentingView ? self.presentingView : self.window;
 }
 
 - (void)presentDropdownForSelectedComponentAnimated:(BOOL)animated completion:(void (^)())completion {
@@ -1352,8 +1434,7 @@ static UIImage *disclosureIndicatorImage = nil;
         return;
     }
     
-    UIViewController *presentingViewController = [self presentingViewController];
-    UIView *presentingView = presentingViewController.view.window;
+    UIView *presentingView = [self containerView];
     
     self.contentViewController.contentInset = [self contentInsetForSelectedComponent];
     
@@ -1369,42 +1450,30 @@ static UIImage *disclosureIndicatorImage = nil;
     }
     self.contentViewController.highlightColor = highlightColor;
     
-    CGRect frame = [presentingView convertRect:self.bounds fromView:self];
-    _presentTransition.topOffset = CGRectGetMaxY(frame);
-    _presentTransition.duration = animated ? kAnimationDuration : 0;
-    [presentingViewController presentViewController:self.contentViewController animated:YES completion:^{
+    [self.transition presentDropdownInContainerView:presentingView animated:animated completion:^{
         if (completion) {
             completion();
         }
     }];
+    
     [self updateComponentButtonsSelection:YES];
 }
 
 - (void)dismissDropdownAnimated:(BOOL)animated completion:(void (^)())completion {
-    if (self.contentViewController.presentingViewController == nil) {
+    if (self.contentViewController.view.window == nil) {
         if (completion) {
             completion();
         }
         return;
     }
     
-    _dismissTransition.duration = animated ? kAnimationDuration : 0;
-    [self.contentViewController.presentingViewController dismissViewControllerAnimated:YES completion:^{
+    [self.transition dismissDropdownAnimated:animated completion:^{
         if (completion) {
             completion();
         }
     }];
+    
     [self updateComponentButtonsSelection:NO];
-}
-
-#pragma mark UIViewControllerTransitioningDelegate
-
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForPresentedController:(UIViewController *)presented presentingController:(UIViewController *)presenting sourceController:(UIViewController *)source {
-    return _presentTransition;
-}
-
-- (id<UIViewControllerAnimatedTransitioning>)animationControllerForDismissedController:(UIViewController *)dismissed {
-    return _dismissTransition;
 }
 
 #pragma mark - DropdownMenuContentViewControllerDelegate

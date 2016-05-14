@@ -33,10 +33,20 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, weak, nonatomic) IBOutlet id<MKDropdownMenuDataSource> dataSource;
 @property (nullable, weak, nonatomic) IBOutlet id<MKDropdownMenuDelegate> delegate;
 
+// the view the dropdown to be presented in. if not specified, the dropdown will be presented in the containing window
+@property (nullable, weak, nonatomic) UIView *presentingView;
+
+// if presented in scroll view, its vertical content offset will be updated to fit the dropdown
+@property (assign, nonatomic) BOOL adjustsContentOffset; // default = NO
+
+// if presented in scroll view, its bottom content inset will be updated to fit the dropdown
+@property (assign, nonatomic) BOOL adjustsContentInset; // default = YES
+
 @property (assign, nonatomic) BOOL dropdownDropsShadow; // default = YES
 @property (assign, nonatomic) BOOL dropdownBouncesScroll; // default = YES
 
-// the strength of the screen dimming (black color) under presented dropdown
+// the strength of the screen dimming (black color) under presented dropdown.
+// negative values produce white dimming color instead of black
 @property (assign, nonatomic) CGFloat backgroundDimmingOpacity; // default = 0.2
 
 // the color of the header components and rows separators
@@ -108,6 +118,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)openComponent:(NSInteger)component animated:(BOOL)animated;
 // dismiss all components
 - (void)closeAllComponentsAnimated:(BOOL)animated;
+
+// moves the dropdown view so that it appears on top of all other subviews in presenting view
+- (void)bringDropdownViewToFront;
 
 @end
 

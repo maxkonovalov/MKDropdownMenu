@@ -33,7 +33,9 @@
     self.navBarMenu = [[MKDropdownMenu alloc] initWithFrame:CGRectMake(0, 0, 200, 44)];
     self.navBarMenu.dataSource = self;
     self.navBarMenu.delegate = self;
-    self.navBarMenu.backgroundDimmingOpacity = 0;
+    
+    // Make background light instead of dark when presenting the dropdown
+    self.navBarMenu.backgroundDimmingOpacity = -0.67;
     
     // Set custom disclosure indicator image
     UIImage *indicator = [UIImage imageNamed:@"indicator"];
@@ -69,6 +71,13 @@
     // Add the dropdown menu to navigation bar
     self.navigationItem.titleView = self.navBarMenu;
     
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self.navBarMenu closeAllComponentsAnimated:NO];
+    [self.childViewController.dropdownMenu closeAllComponentsAnimated:NO];
 }
 
 #pragma mark - MKDropdownMenuDataSource
@@ -110,7 +119,7 @@
 }
 
 - (UIColor *)dropdownMenu:(MKDropdownMenu *)dropdownMenu backgroundColorForHighlightedRowsInComponent:(NSInteger)component {
-    return [UIColor colorWithWhite:1.0 alpha:0.5];
+    return [UIColor colorWithWhite:0.0 alpha:0.5];
 }
 
 
