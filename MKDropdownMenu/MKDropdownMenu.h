@@ -42,19 +42,19 @@ NS_ASSUME_NONNULL_BEGIN
 // if presented in scroll view, its bottom content inset will be updated to fit the dropdown
 @property (assign, nonatomic) BOOL adjustsContentInset; // default = YES
 
-@property (assign, nonatomic) BOOL dropdownDropsShadow; // default = YES
-@property (assign, nonatomic) BOOL dropdownBouncesScroll; // default = YES
+@property (assign, nonatomic) BOOL dropdownDropsShadow UI_APPEARANCE_SELECTOR; // default = YES
+@property (assign, nonatomic) BOOL dropdownBouncesScroll UI_APPEARANCE_SELECTOR; // default = YES
 
 // the strength of the screen dimming (black color) under presented dropdown.
 // negative values produce white dimming color instead of black
-@property (assign, nonatomic) CGFloat backgroundDimmingOpacity; // default = 0.2
+@property (assign, nonatomic) CGFloat backgroundDimmingOpacity UI_APPEARANCE_SELECTOR; // default = 0.2
 
 // the color of the header components and rows separators
-@property (nullable, strong, nonatomic) UIColor *componentSeparatorColor;
-@property (nullable, strong, nonatomic) UIColor *rowSeparatorColor;
+@property (nullable, strong, nonatomic) UIColor *componentSeparatorColor UI_APPEARANCE_SELECTOR;
+@property (nullable, strong, nonatomic) UIColor *rowSeparatorColor UI_APPEARANCE_SELECTOR;
 
 // show the separator above the first row in dropdown
-@property (assign, nonatomic) BOOL showsTopRowSeparator; // default = YES
+@property (assign, nonatomic) BOOL showsTopRowSeparator UI_APPEARANCE_SELECTOR; // default = YES
 
 // the view to place between header component and dropdown (like an arrow in popover).
 // the height of the view's frame is preserved, and the view itself is stretched to fit the witdth of the dropdown
@@ -64,25 +64,25 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) UIOffset spacerViewOffset;
 
 // the background color of the expanded header component
-@property (nullable, strong, nonatomic) UIColor *selectedComponentBackgroundColor;
+@property (nullable, strong, nonatomic) UIColor *selectedComponentBackgroundColor UI_APPEARANCE_SELECTOR;
 
 // the background color of the dropdown rows.
 // for semi-transparent background colors (alpha < 1), `shouldDropShadow` must be set to NO
-@property (nullable, strong, nonatomic) UIColor *dropdownBackgroundColor; // default = white
+@property (nullable, strong, nonatomic) UIColor *dropdownBackgroundColor UI_APPEARANCE_SELECTOR; // default = white
 
 // the accessory image in the header components, rotates to indicate open/closed state.
 // provide an image with UIImageRenderingModeAlwaysTemplate to respect the view's tint color
-@property (nullable, strong, nonatomic) UIImage *disclosureIndicatorImage;
+@property (nullable, strong, nonatomic) UIImage *disclosureIndicatorImage UI_APPEARANCE_SELECTOR;
 
 // the alignment of the labels in header components and rows
-@property (assign, nonatomic) NSTextAlignment componentTextAlignment; // default = NSTextAlignmentCenter
-@property (assign, nonatomic) NSTextAlignment rowTextAlignment; // default = NSTextAlignmentLeft
+@property (assign, nonatomic) NSTextAlignment componentTextAlignment UI_APPEARANCE_SELECTOR; // default = NSTextAlignmentCenter
+@property (assign, nonatomic) NSTextAlignment rowTextAlignment UI_APPEARANCE_SELECTOR; // default = NSTextAlignmentLeft
 
 // the corner radius of the dropdown
-@property (assign, nonatomic) CGFloat dropdownCornerRadius; // default = 2
+@property (assign, nonatomic) CGFloat dropdownCornerRadius UI_APPEARANCE_SELECTOR; // default = 2
 
 // the corners to be rounded in the dropdown
-@property (assign, nonatomic) UIRectCorner dropdownRoundedCorners; // default = UIRectCornerBottomLeft|UIRectCornerBottomRight
+@property (assign, nonatomic) UIRectCorner dropdownRoundedCorners UI_APPEARANCE_SELECTOR; // default = UIRectCornerBottomLeft|UIRectCornerBottomRight
 
 // if `useFullScreenWidth = YES`, the dropdown will occupy the full width of the screen for all components marked in `-dropdownMenu:shouldUseFullRowWidthForComponent:`, otherwise the width of these components will be equal to DropdownMenu's width
 @property (assign, nonatomic) BOOL useFullScreenWidth; // default = NO

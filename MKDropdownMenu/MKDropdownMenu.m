@@ -24,6 +24,8 @@
 
 #import "MKDropdownMenu.h"
 
+#pragma mark - Constants -
+
 static const NSTimeInterval kAnimationDuration = 0.25;
 
 static const CGFloat kDefaultRowHeight = 44;
@@ -34,6 +36,17 @@ static const CGFloat kDefaultBackgroundDimmingOpacity = 0.2;
 static const CGFloat kShadowOpacity = 0.2;
 
 static NSString * const kCellIdentifier = @"cell";
+
+
+@interface UIColor (MKDropdownMenu)
++ (UIColor *)mk_defaultSeparatorColor;
+@end
+
+@implementation UIColor (MKDropdownMenu)
++ (UIColor *)mk_defaultSeparatorColor {
+    return [UIColor colorWithRed:0.78 green:0.78 blue:0.8 alpha:1.0];
+}
+@end
 
 
 #pragma mark - Component Button -
@@ -401,6 +414,7 @@ static UIImage *disclosureIndicatorImage = nil;
     self.tableView.layoutMargins = UIEdgeInsetsZero;
     self.tableView.separatorInset = UIEdgeInsetsZero;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.separatorColor = [UIColor mk_defaultSeparatorColor];
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     
     self.showsTopRowSeparator = YES;
@@ -1024,7 +1038,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (void)updateComponentSeparators {
     UIColor *separatorColor = self.componentSeparatorColor
-    ? self.componentSeparatorColor : [UIColor colorWithRed:0.78 green:0.78 blue:0.8 alpha:1.0];
+    ? self.componentSeparatorColor : [UIColor mk_defaultSeparatorColor];
     
     [self.separators enumerateObjectsUsingBlock:^(UIView *obj, NSUInteger idx, BOOL *stop) {
         obj.backgroundColor = separatorColor;
@@ -1148,7 +1162,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (void)setRowSeparatorColor:(UIColor *)rowSeparatorColor {
     _rowSeparatorColor = rowSeparatorColor;
-    UIColor *separatorColor = rowSeparatorColor ? rowSeparatorColor : [UIColor colorWithRed:0.78 green:0.78 blue:0.8 alpha:1.0];
+    UIColor *separatorColor = rowSeparatorColor ? rowSeparatorColor : [UIColor mk_defaultSeparatorColor];
     self.contentViewController.tableView.separatorColor = separatorColor;
     self.contentViewController.tableView.tableHeaderView.backgroundColor = separatorColor;
 }
