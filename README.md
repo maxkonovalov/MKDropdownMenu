@@ -72,6 +72,8 @@ You can also provide an `NSAttributedString` or custom `UIView` as the display d
 
 The appearance and behavior of the `MKDropdownMenu` can be customized by setting its property values or implementing the corresponding `delegate` methods.
 
+The default menu appearance can be customized throughout the app using the available `UI_APPEARANCE_SELECTOR` properties.
+
 
 ## Requirements
 - iOS 8+
