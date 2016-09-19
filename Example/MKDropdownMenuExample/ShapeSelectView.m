@@ -11,6 +11,7 @@
 @implementation ShapeSelectView
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
     self.shapeView.fillColor = [UIColor clearColor];
     self.shapeView.strokeColor = self.textLabel.textColor;
     self.shapeView.lineWidth = 1;
