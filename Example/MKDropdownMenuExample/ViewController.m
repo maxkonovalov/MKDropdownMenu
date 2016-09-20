@@ -53,7 +53,7 @@
     self.navBarMenu.spacerViewOffset = UIOffsetMake(self.navBarMenu.bounds.size.width/2 - indicator.size.width/2 - 8, 1);
     
     // Hide top row separator to blend with the arrow
-    self.navBarMenu.showsTopRowSeparator = NO;
+    self.navBarMenu.dropdownShowsTopRowSeparator = NO;
     
     self.navBarMenu.dropdownBouncesScroll = NO;
     

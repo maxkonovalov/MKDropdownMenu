@@ -30,6 +30,12 @@
     return cell;
 }
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    for (MenuTableViewCell *cell in self.tableView.visibleCells) {
+        [cell.dropdownMenu closeAllComponentsAnimated:YES];
+    }
+}
+
 #pragma mark - MKDropdownMenuDataSource
 
 - (NSInteger)numberOfComponentsInDropdownMenu:(MKDropdownMenu *)dropdownMenu {

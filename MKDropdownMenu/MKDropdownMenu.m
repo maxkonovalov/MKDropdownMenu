@@ -76,6 +76,7 @@ static UIImage * MKDropdownMenuDisclosureIndicatorImage() {
 @property (readonly, nonatomic) UIView *currentCustomView;
 @property (assign, nonatomic) NSTextAlignment textAlignment;
 @property (strong, nonatomic) UIColor *selectedBackgroundColor;
+@property (assign, nonatomic) CGFloat disclosureIndicatorAngle;
 - (void)setAttributedTitle:(NSAttributedString *)title selectedTitle:(NSAttributedString *)selectedTitle;
 - (void)setCustomView:(UIView *)customView;
 - (void)setDisclosureIndicatorImage:(UIImage *)image;
@@ -198,7 +199,7 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
-    self.disclosureIndicatorView.transform = CGAffineTransformMakeRotation(selected ? M_PI : 0.0);
+    self.disclosureIndicatorView.transform = CGAffineTransformMakeRotation(selected ? self.disclosureIndicatorAngle : 0.0);
     self.backgroundColor = selected ? self.selectedBackgroundColor : nil;
 }
 
@@ -329,6 +330,10 @@ static UIImage *disclosureIndicatorImage = nil;
 
 @property (strong, nonatomic) UIView *shadowView;
 
+@property (strong, nonatomic) UIView *borderView;
+@property (strong, nonatomic) CAShapeLayer *borderLayer;
+@property (assign, nonatomic) BOOL showsBorder;
+
 @property (strong, nonatomic) UIView *tableContainerView;
 @property (strong, nonatomic) UITableView *tableView;
 
@@ -443,11 +448,29 @@ static UIImage *disclosureIndicatorImage = nil;
     self.separatorContainerView.translatesAutoresizingMaskIntoConstraints = NO;
     
     
+    // Border
+    
+    self.borderView = [UIView new];
+    self.borderView.backgroundColor = [UIColor clearColor];
+    self.borderView.userInteractionEnabled = NO;
+    self.borderView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    self.borderLayer = [CAShapeLayer layer];
+    self.borderLayer.frame = self.tableContainerView.bounds;
+    self.borderLayer.fillColor = [[UIColor clearColor] CGColor];
+    self.borderLayer.strokeColor = [[UIColor mk_defaultSeparatorColor] CGColor];
+    self.borderLayer.lineWidth = 1;
+    
+    [self.borderView.layer addSublayer:self.borderLayer];
+    
+    self.borderView.hidden = YES;
+    
     
     /* Add subviews */
     
     [self.view addSubview:self.containerView];
     [self.containerView addSubview:self.shadowView];
+    [self.containerView addSubview:self.borderView];
     [self.containerView addSubview:self.separatorContainerView];
     [self.containerView addSubview:self.tableContainerView];
     [self.tableContainerView addSubview:self.tableView];
@@ -518,6 +541,35 @@ static UIImage *disclosureIndicatorImage = nil;
                                                                       attribute:NSLayoutAttributeBottom
                                                                      multiplier:1.0
                                                                        constant:0.0]]];
+    
+    [self.containerView addConstraints:@[[NSLayoutConstraint constraintWithItem:self.borderView
+                                                                      attribute:NSLayoutAttributeTop
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.tableContainerView
+                                                                      attribute:NSLayoutAttributeTop
+                                                                     multiplier:1.0
+                                                                       constant:0.0],
+                                         [NSLayoutConstraint constraintWithItem:self.borderView
+                                                                      attribute:NSLayoutAttributeLeft
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.tableContainerView
+                                                                      attribute:NSLayoutAttributeLeft
+                                                                     multiplier:1.0
+                                                                       constant:0.0],
+                                         [NSLayoutConstraint constraintWithItem:self.tableContainerView
+                                                                      attribute:NSLayoutAttributeRight
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.borderView
+                                                                      attribute:NSLayoutAttributeRight
+                                                                     multiplier:1.0
+                                                                       constant:0.0],
+                                         [NSLayoutConstraint constraintWithItem:self.tableContainerView
+                                                                      attribute:NSLayoutAttributeBottom
+                                                                      relatedBy:NSLayoutRelationEqual
+                                                                         toItem:self.borderView
+                                                                      attribute:NSLayoutAttributeBottom
+                                                                     multiplier:1.0
+                                                                       constant:0.0]]];
 }
 
 - (void)viewDidLayoutSubviews {
@@ -546,6 +598,8 @@ static UIImage *disclosureIndicatorImage = nil;
     CAShapeLayer *mask = (CAShapeLayer *)self.tableContainerView.layer.mask;
     mask.path = maskPath.CGPath;
     self.shadowView.layer.shadowRadius = MAX(r, kDefaultCornerRadius);
+    
+    self.borderLayer.path = maskPath.CGPath;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -646,6 +700,14 @@ static UIImage *disclosureIndicatorImage = nil;
     return self.tableView.tableHeaderView != nil;
 }
 
+- (void)setShowsBorder:(BOOL)showsBorder {
+    self.borderView.hidden = !showsBorder;
+}
+
+- (BOOL)showsBorder {
+    return !self.borderView.hidden;
+}
+
 #pragma mark - Gestures
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -656,7 +718,7 @@ static UIImage *disclosureIndicatorImage = nil;
 }
 
 - (void)handleTap:(UITapGestureRecognizer *)recognizer {
-    [self.delegate didSelectRow:-1];
+    [self.delegate didSelectRow:NSNotFound];
 }
 
 #pragma mark - UITableView
@@ -686,7 +748,13 @@ static UIImage *disclosureIndicatorImage = nil;
     cell.textLabel.textAlignment = self.textAlignment;
     
     cell.layoutMargins = UIEdgeInsetsZero;
-        
+    
+    if (self.showsBorder && indexPath.row == self.rowsCount - 1) {
+        cell.separatorInset = UIEdgeInsetsMake(0, CGRectGetWidth(tableView.bounds), 0, 0);
+    } else {
+        cell.separatorInset = UIEdgeInsetsZero;
+    }
+    
     return cell;
 }
 
@@ -882,7 +950,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 @property (strong, nonatomic) NSMutableArray<UIView *> *separators;
 
 @property (strong, nonatomic) NSMutableArray<NSNumber *> *components;
-@property (assign, nonatomic) NSInteger selectedComponent; // -1 when no components are selected
+@property (assign, nonatomic) NSInteger selectedComponent; // NSNotFound when no components are selected
 @property (strong, nonatomic) NSMutableArray<NSMutableIndexSet *> *selectedRows;
 
 @end
@@ -917,12 +985,14 @@ static const CGFloat kScrollViewBottomSpace = 5;
     self.transition = [[MKDropdownMenuTransition alloc] initWithDropdownMenu:self
                                                        contentViewController:self.contentViewController];
     
-    _selectedComponent = -1;
+    _selectedComponent = NSNotFound;
     
     _componentTextAlignment = NSTextAlignmentCenter;
     
     _adjustsContentInset = YES;
     _adjustsContentOffset = NO;
+    
+    _disclosureIndicatorSelectionRotation = M_PI;
     
     self.components = [NSMutableArray new];
     self.selectedRows = [NSMutableArray new];
@@ -989,6 +1059,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     [button setTextAlignment:self.componentTextAlignment];
     [button setDisclosureIndicatorImage:self.disclosureIndicatorImage];
     [button setSelectedBackgroundColor:self.selectedComponentBackgroundColor];
+    [button setDisclosureIndicatorAngle:self.disclosureIndicatorSelectionRotation];
     
     UIView *customView = button.currentCustomView;
     
@@ -1119,7 +1190,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     [self layoutComponentButtons];
     [self layoutComponentSeparators];
     
-    if (self.selectedComponent != -1) {
+    if (self.selectedComponent != NSNotFound) {
         self.contentViewController.contentInset = [self contentInsetForSelectedComponent];
     }
 }
@@ -1141,6 +1212,22 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (BOOL)dropdownBouncesScroll {
     return self.contentViewController.tableView.bounces;
+}
+
+- (void)setDropdownShowsTopRowSeparator:(BOOL)dropdownShowsTopRowSeparator {
+    self.contentViewController.showsTopRowSeparator = dropdownShowsTopRowSeparator;
+}
+
+- (BOOL)dropdownShowsTopRowSeparator {
+    return self.contentViewController.showsTopRowSeparator;
+}
+
+- (void)setDropdownShowsBorder:(BOOL)dropdownShowsBorder {
+    self.contentViewController.showsBorder = dropdownShowsBorder;
+}
+
+- (BOOL)dropdownShowsBorder {
+    return self.contentViewController.showsBorder;
 }
 
 - (void)setBackgroundDimmingOpacity:(CGFloat)backgroundDimmingOpacity {
@@ -1165,14 +1252,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     UIColor *separatorColor = rowSeparatorColor ? rowSeparatorColor : [UIColor mk_defaultSeparatorColor];
     self.contentViewController.tableView.separatorColor = separatorColor;
     self.contentViewController.tableView.tableHeaderView.backgroundColor = separatorColor;
-}
-
-- (void)setShowsTopRowSeparator:(BOOL)showsTopRowSeparator {
-    self.contentViewController.showsTopRowSeparator = showsTopRowSeparator;
-}
-
-- (BOOL)showsTopRowSeparator {
-    return self.contentViewController.showsTopRowSeparator;
+    self.contentViewController.borderLayer.strokeColor = separatorColor.CGColor;
 }
 
 - (void)setSpacerView:(UIView *)spacerView {
@@ -1204,6 +1284,11 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (void)setDisclosureIndicatorImage:(UIImage *)disclosureIndicatorImage {
     _disclosureIndicatorImage = disclosureIndicatorImage;
+    [self updateComponentButtons];
+}
+
+- (void)setDisclosureIndicatorSelectionRotation:(CGFloat)disclosureIndicatorSelectionRotation {
+    _disclosureIndicatorSelectionRotation = disclosureIndicatorSelectionRotation;
     [self updateComponentButtons];
 }
 
@@ -1250,7 +1335,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (UIView *)viewForRow:(NSInteger)row forComponent:(NSInteger)component {
-    if (self.selectedComponent == -1 || component != self.selectedComponent) {
+    if (self.selectedComponent == NSNotFound || component != self.selectedComponent) {
         return nil;
     }
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:row inSection:0];
@@ -1278,7 +1363,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     
     [self updateButton:self.buttons[component] forComponent:component];
     
-    if (self.selectedComponent != -1 && component == self.selectedComponent) {
+    if (self.selectedComponent != NSNotFound && component == self.selectedComponent) {
         [self.contentViewController updateData];
     }
 }
@@ -1328,12 +1413,12 @@ static const CGFloat kScrollViewBottomSpace = 5;
     void (^presentation)() = ^{
         self.selectedComponent = component;
         [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
-        if (component != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didOpenComponent:)]) {
+        if (component != NSNotFound && [self.delegate respondsToSelector:@selector(dropdownMenu:didOpenComponent:)]) {
             [self.delegate dropdownMenu:self didOpenComponent:component];
         }
     };
     
-    if (previousComponent != -1) {
+    if (previousComponent != NSNotFound) {
         [self dismissDropdownAnimated:animated completion:^{
             presentation();
         }];
@@ -1373,7 +1458,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (UIEdgeInsets)contentInsetForSelectedComponent {
-    if (self.selectedComponent == -1) {
+    if (self.selectedComponent == NSNotFound) {
         return UIEdgeInsetsZero;
     }
     
@@ -1406,15 +1491,15 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (void)cleanupSelectedComponents {
     NSInteger previousComponent = self.selectedComponent;
-    self.selectedComponent = -1;
-    if (previousComponent != -1 && [self.delegate respondsToSelector:@selector(dropdownMenu:didCloseComponent:)]) {
+    self.selectedComponent = NSNotFound;
+    if (previousComponent != NSNotFound && [self.delegate respondsToSelector:@selector(dropdownMenu:didCloseComponent:)]) {
         [self.delegate dropdownMenu:self didCloseComponent:previousComponent];
     }
 }
 
 - (void)updateComponentButtonsSelection:(BOOL)selected {
     void (^animation)() = ^{
-        if (selected) {
+        if (selected && self.selectedComponent != NSNotFound) {
             [self.buttons[self.selectedComponent] setSelected:YES];
         } else {
             [self.buttons enumerateObjectsUsingBlock:^(MKDropdownMenuComponentButton *btn, NSUInteger idx, BOOL *stop) {
@@ -1441,7 +1526,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (void)presentDropdownForSelectedComponentAnimated:(BOOL)animated completion:(void (^)())completion {
-    if (self.selectedComponent == -1) {
+    if (self.selectedComponent == NSNotFound) {
         if (completion) {
             completion();
         }
@@ -1493,14 +1578,14 @@ static const CGFloat kScrollViewBottomSpace = 5;
 #pragma mark - DropdownMenuContentViewControllerDelegate
 
 - (NSInteger)numberOfRows {
-    if (self.selectedComponent == -1) {
+    if (self.selectedComponent == NSNotFound) {
         return 0;
     }
     return [self numberOfRowsInComponent:self.selectedComponent];
 }
 
 - (NSInteger)maximumNumberOfRows {
-    if (self.selectedComponent == -1) {
+    if (self.selectedComponent == NSNotFound) {
         return 0;
     }
     
@@ -1564,7 +1649,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (void)didSelectRow:(NSInteger)row {
-    if (row == -1) {
+    if (row == NSNotFound) {
         [self selectedComponent:nil];
     } else if ([self.delegate respondsToSelector:@selector(dropdownMenu:didSelectRow:inComponent:)]) {
         [self.delegate dropdownMenu:self didSelectRow:row inComponent:self.selectedComponent];
@@ -1572,7 +1657,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (void)willDisappear {
-    if (self.selectedComponent != -1) {
+    if (self.selectedComponent != NSNotFound) {
         [self cleanupSelectedComponents];
         [self updateComponentButtonsSelection:NO];
     }
