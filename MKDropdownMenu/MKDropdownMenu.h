@@ -137,7 +137,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Moves the dropdown view so that it appears on top of all other subviews in presenting view.
 - (void)bringDropdownViewToFront;
-
+    
+/// Returns the status whether component menu is opened or not.
+- (BOOL)isComponentOpened;
 @end
 
 

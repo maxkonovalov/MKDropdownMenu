@@ -1438,6 +1438,10 @@ static const CGFloat kScrollViewBottomSpace = 5;
 - (void)bringDropdownViewToFront {
     [self.contentViewController.view.superview bringSubviewToFront:self.contentViewController.view];
 }
+    
+- (BOOL)isComponentOpened {
+    return self.selectedComponent != NSNotFound;
+}
 
 #pragma mark - Private
 
