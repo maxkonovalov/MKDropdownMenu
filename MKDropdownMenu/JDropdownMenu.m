@@ -668,29 +668,21 @@ static const CGFloat jkScrollViewBottomSpace = 5;
 }
 
 - (void)openComponentAnimated:(BOOL)animated {
-    void (^presentation)() = ^{
-        self.isComponentOpened = YES;
-        [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
-        if ([self.delegate respondsToSelector:@selector(dropdownMenuComponentDidOpen:)]) {
-            [self.delegate dropdownMenuComponentDidOpen:self];
-        }
-    };
-    
-    if (!self.isComponentOpened) {
-        [self dismissDropdownAnimated:animated completion:^{
-            presentation();
-        }];
-        if ([self.delegate respondsToSelector:@selector(dropdownMenuComponentDidClose:)]) {
-            [self.delegate dropdownMenuComponentDidClose:self];
-        }
-    } else {
-        presentation();
+    self.isComponentOpened = YES;
+    [self presentDropdownForSelectedComponentAnimated:animated completion:nil];
+    if ([self.delegate respondsToSelector:@selector(dropdownMenuComponentDidOpen:)]) {
+        [self.delegate dropdownMenuComponentDidOpen:self];
     }
 }
 
 - (void)closeComponentAnimated:(BOOL)animated {
-    [self dismissDropdownAnimated:animated completion:nil];
+    [self dismissDropdownAnimated:animated completion:^{
+        if ([self.delegate respondsToSelector:@selector(dropdownMenuComponentDidClose:)]) {
+            [self.delegate dropdownMenuComponentDidClose:self];
+        }
+    }];
     [self cleanupComponent];
+    
 }
 
 - (void)bringDropdownViewToFront {

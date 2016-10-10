@@ -7,15 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MKDropdownMenu.h"
-#import "ChildViewController.h"
 
-@interface ViewController : UIViewController <MKDropdownMenuDataSource, MKDropdownMenuDelegate>
 
-@property (strong, nonatomic) MKDropdownMenu *navBarMenu;
-
-@property (weak, nonatomic) IBOutlet UILabel *textLabel;
-
-@property (readonly, nonatomic) ChildViewController *childViewController;
+@interface ViewController : UIViewController
 
 @end
