@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = "MKDropdownMenu"
+  s.name             = "JDropdownMenu"
   s.version          = "1.3"
   s.summary          = "Dropdown Menu for iOS"
   s.description      = <<-DESC

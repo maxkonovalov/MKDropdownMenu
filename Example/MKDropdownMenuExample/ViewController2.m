@@ -6,25 +6,21 @@
 //  Copyright © 2016 Max Konovalov. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "ViewController2.h"
 #import "JDropdownMenu.h"
 #import "Utilities.h"
 
-@interface ViewController () <JDropdownMenuDelegate>
+
+@interface ViewController2()<JDropdownMenuDelegate>
 
 @property (weak, nonatomic) IBOutlet JDropdownMenu *navBarMenu;
 @end
-
-@implementation ViewController
+@implementation ViewController2
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = UIColorWithHexString(@"#E5EDFF");
-    
-    
-    // Create dropdown menu in code
-    self.navBarMenu.delegate = self;
+        self.navBarMenu.delegate = self;
     
     // Make background light instead of dark when presenting the dropdown
     self.navBarMenu.backgroundDimmingOpacity = 0.15;
@@ -57,7 +53,7 @@
     UILabel *view = [UILabel new];
     view.text = @"Hello, world.";
     view.textColor = [UIColor whiteColor];
-    view.backgroundColor = UIColorWithHexString(@"3990D4");
+    view.backgroundColor = UIColorWithHexString(@"0DA199");
     self.navBarMenu.containerCustomView = view;
     self.navBarMenu.contentHeight = 60;
     
@@ -71,18 +67,6 @@
 }
 
 #pragma mark - MKDropdownMenuDelegate
-
-- (void)dropdownMenu:(JDropdownMenu *)dropdownMenu didTapBlankAreaInComponent:(NSInteger)component {
-    NSLog(@"didTapBlankAreaInComponent");
-}
-
--(void)dropdownMenuComponentDidOpen:(JDropdownMenu *)dropdownMenu {
-    NSLog(@"dropdownMenuComponentDidOpen");
-}
-
--(void)dropdownMenuComponentDidClose:(JDropdownMenu *)dropdownMenu {
-    NSLog(@"dropdownMenuComponentDidClose");
-}
 
 - (IBAction)barMenuCick:(id)sender {
     if([self.navBarMenu isComponentOpened]) {
