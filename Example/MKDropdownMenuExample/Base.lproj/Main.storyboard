@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="psA-cf-bXE">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="2ig-Oa-yzy">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
@@ -67,7 +67,7 @@
                     <navigationItem key="navigationItem" title="MKDropdownMenu" id="OtQ-5h-L9V">
                         <barButtonItem key="rightBarButtonItem" image="icon-table" id="om6-Aw-1BY">
                             <connections>
-                                <segue destination="kVP-vd-33j" kind="show" id="ygY-Ec-KFA"/>
+                                <action selector="buttonClick:" destination="BYZ-38-t0r" id="viq-CO-B6m"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -79,10 +79,68 @@
             </objects>
             <point key="canvasLocation" x="1013" y="1059"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Item 2-->
+        <scene sceneID="7Af-yo-p74">
+            <objects>
+                <viewController id="zBE-uK-2Hn" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="c2A-sk-Oey"/>
+                        <viewControllerLayoutGuide type="bottom" id="HmG-BD-3v7"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="f3J-wO-ntw">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Item 2" id="h9C-LI-KTi"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dPl-DD-IYL" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-570" y="975"/>
+        </scene>
+        <!--Item 1-->
+        <scene sceneID="v0Y-Ce-nmE">
+            <objects>
+                <viewController id="L77-sL-VQD" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="9yl-Gc-Q5b"/>
+                        <viewControllerLayoutGuide type="bottom" id="Nk5-hD-jzw"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="LAk-iD-uLO">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Item 1" id="I9u-Ds-xkc"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ni3-8l-gw3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-570" y="320"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="UFC-ah-pBO">
+            <objects>
+                <tabBarController id="2ig-Oa-yzy" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="SGe-xI-K2F">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="psA-cf-bXE" kind="relationship" relationship="viewControllers" id="V8y-Sv-ICf"/>
+                        <segue destination="L77-sL-VQD" kind="relationship" relationship="viewControllers" id="op7-6R-5cK"/>
+                        <segue destination="zBE-uK-2Hn" kind="relationship" relationship="viewControllers" id="3xQ-Us-8Iy"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fpd-t2-WtK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1522" y="648"/>
+        </scene>
+        <!--Item-->
         <scene sceneID="0NH-43-vT5">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="psA-cf-bXE" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="Mfd-7X-NUv"/>
                     <toolbarItems/>
                     <simulatedStatusBarMetrics key="simulatedStatusBarMetrics" statusBarStyle="lightContent"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" barStyle="black" translucent="NO" id="ln2-zO-DCm">
@@ -159,7 +217,7 @@
             <objects>
                 <tableViewController id="kVP-vd-33j" customClass="TableViewController" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelection="NO" rowHeight="50" sectionHeaderHeight="28" sectionFooterHeight="28" id="Yoc-dh-sfz">
-                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
@@ -170,10 +228,10 @@
                         </view>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="MenuCell" id="pTy-Wc-DRn" customClass="MenuTableViewCell">
-                                <rect key="frame" x="0.0" y="28.5" width="375" height="50"/>
+                                <rect key="frame" x="0.0" y="29" width="375" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pTy-Wc-DRn" id="TNL-M8-tbE">
-                                    <frame key="frameInset" width="375" height="49.5"/>
+                                    <frame key="frameInset" width="375" height="49"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="k3t-Yg-wiy" customClass="MKDropdownMenu">

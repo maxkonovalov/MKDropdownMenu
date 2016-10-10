@@ -41,14 +41,7 @@
     UIImage *indicator = [UIImage imageNamed:@"indicator"];
     self.navBarMenu.disclosureIndicatorImage = indicator;
     
-    // Add an arrow between the menu header and the dropdown
-    UIImageView *spacer = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"triangle"]];
 
-    // Prevent the arrow image from stretching
-    spacer.contentMode = UIViewContentModeCenter;
-    
-    self.navBarMenu.spacerView = spacer;
-    
     // Offset the arrow to align with the disclosure indicator
     self.navBarMenu.spacerViewOffset = UIOffsetMake(self.navBarMenu.bounds.size.width/2 - indicator.size.width/2 - 8, 1);
     
@@ -60,13 +53,8 @@
     self.navBarMenu.rowSeparatorColor = [UIColor colorWithWhite:1.0 alpha:0.2];
     self.navBarMenu.rowTextAlignment = NSTextAlignmentCenter;
     
-    // Round all corners (by default only bottom corners are rounded)
-    self.navBarMenu.dropdownRoundedCorners = UIRectCornerAllCorners;
-    
     // Let the dropdown take the whole width of the screen with 10pt insets
     self.navBarMenu.useFullScreenWidth = YES;
-    self.navBarMenu.fullScreenInsetLeft = 10;
-    self.navBarMenu.fullScreenInsetRight = 10;
     
     // Add the dropdown menu to navigation bar
     self.navigationItem.titleView = self.navBarMenu;
@@ -134,6 +122,13 @@
     delay(0.15, ^{
         [dropdownMenu closeAllComponentsAnimated:YES];
     });
+}
+- (IBAction)buttonClick:(id)sender {
+    if (![self.navBarMenu isComponentOpened]) {
+        [self.navBarMenu openComponent:0 animated:YES];
+    } else {
+        [self.navBarMenu closeAllComponentsAnimated:YES];
+    }
 }
 
 @end
