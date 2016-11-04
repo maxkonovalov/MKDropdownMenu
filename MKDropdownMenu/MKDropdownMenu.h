@@ -103,7 +103,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (assign, nonatomic) CGFloat fullScreenInsetRight;
 
 /// Allow multiple rows selection in dropdown. Default = NO.
-@property (assign, nonatomic) BOOL allowsMultipleSelection;
+@property (assign, nonatomic) BOOL allowsMultipleRowsSelection;
+
+/// The currently expanded component. NSNotFound when no components are selected.
+@property (readonly, nonatomic) NSInteger selectedComponent;
 
 /// The number of components in the dropdown (cached from the data source).
 - (NSInteger)numberOfComponents;

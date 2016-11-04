@@ -950,7 +950,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 @property (strong, nonatomic) NSMutableArray<UIView *> *separators;
 
 @property (strong, nonatomic) NSMutableArray<NSNumber *> *components;
-@property (assign, nonatomic) NSInteger selectedComponent; // NSNotFound when no components are selected
+@property (assign, nonatomic) NSInteger selectedComponent;
 @property (strong, nonatomic) NSMutableArray<NSMutableIndexSet *> *selectedRows;
 
 @end
@@ -1374,7 +1374,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     
     NSMutableIndexSet *indexesToUpdate = [NSMutableIndexSet new];
     
-    if (!self.allowsMultipleSelection) {
+    if (!self.allowsMultipleRowsSelection) {
         [self.selectedRows[component] enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
             [indexesToUpdate addIndex:idx];
         }];
