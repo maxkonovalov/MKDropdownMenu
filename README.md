@@ -77,7 +77,7 @@ The default menu appearance can be customized throughout the app using the avail
 
 ## Requirements
 - iOS 8+
-- Xcode 7+
+- Xcode 8+
 
 ## License
 `MKDropdownMenu` is available under the MIT license. See the LICENSE file for more info.
