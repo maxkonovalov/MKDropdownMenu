@@ -748,12 +748,7 @@ static UIImage *disclosureIndicatorImage = nil;
     cell.textLabel.textAlignment = self.textAlignment;
     
     cell.layoutMargins = UIEdgeInsetsZero;
-    
-    if (self.showsBorder && indexPath.row == self.rowsCount - 1) {
-        cell.separatorInset = UIEdgeInsetsMake(0, CGRectGetWidth(tableView.bounds), 0, 0);
-    } else {
-        cell.separatorInset = UIEdgeInsetsZero;
-    }
+    cell.separatorInset = UIEdgeInsetsZero;
     
     return cell;
 }
