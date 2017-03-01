@@ -48,8 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// Bounce table view scroll of the dropdown. Default = YES.
 @property (assign, nonatomic) BOOL dropdownBouncesScroll UI_APPEARANCE_SELECTOR;
 
-/// Show the separator above the first row in dropdown.
+/// Show the separator above the first row in dropdown. Default = YES.
 @property (assign, nonatomic) BOOL dropdownShowsTopRowSeparator UI_APPEARANCE_SELECTOR;
+
+/// Show the separator below the last row in dropdown. Default = YES.
+@property (assign, nonatomic) BOOL dropdownShowsBottomRowSeparator UI_APPEARANCE_SELECTOR;
 
 /// Show the border around the dropdown. Drawn in the same color as row separators. Default = NO.
 @property (assign, nonatomic) BOOL dropdownShowsBorder UI_APPEARANCE_SELECTOR;

@@ -42,6 +42,7 @@ NS_ENUM(NSInteger, DropdownComponents) {
     self.dropdownMenu.dropdownBackgroundColor = selectedBackgroundColor;
     
     self.dropdownMenu.dropdownShowsTopRowSeparator = NO;
+    self.dropdownMenu.dropdownShowsBottomRowSeparator = NO;
     self.dropdownMenu.dropdownShowsBorder = YES;
     
     self.dropdownMenu.backgroundDimmingOpacity = 0.05;

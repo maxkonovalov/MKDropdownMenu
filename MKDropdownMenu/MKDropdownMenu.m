@@ -341,6 +341,7 @@ static UIImage *disclosureIndicatorImage = nil;
 @property (strong, nonatomic) UIView *separatorContainerView;
 @property (assign, nonatomic) UIOffset separatorViewOffset;
 @property (assign, nonatomic) BOOL showsTopRowSeparator;
+@property (assign, nonatomic) BOOL showsBottomRowSeparator;
 
 @property (strong, nonatomic) UIColor *highlightColor;
 
@@ -424,6 +425,7 @@ static UIImage *disclosureIndicatorImage = nil;
     self.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     
     self.showsTopRowSeparator = YES;
+    self.showsBottomRowSeparator = YES;
     
     [self.tableView registerClass:[MKDropdownMenuTableViewCell class] forCellReuseIdentifier:kCellIdentifier];
     
@@ -750,7 +752,7 @@ static UIImage *disclosureIndicatorImage = nil;
     
     cell.layoutMargins = UIEdgeInsetsZero;
     
-    if (self.showsBorder && indexPath.row == self.rowsCount - 1) {
+    if (!self.showsBottomRowSeparator && indexPath.row == self.rowsCount - 1) {
         cell.separatorInset = UIEdgeInsetsMake(0, CGRectGetWidth(tableView.bounds), 0, 0);
     } else {
         cell.separatorInset = UIEdgeInsetsZero;
@@ -1221,6 +1223,14 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (BOOL)dropdownShowsTopRowSeparator {
     return self.contentViewController.showsTopRowSeparator;
+}
+
+- (void)setDropdownShowsBottomRowSeparator:(BOOL)dropdownShowsBottomRowSeparator {
+    self.contentViewController.showsBottomRowSeparator = dropdownShowsBottomRowSeparator;
+}
+
+- (BOOL)dropdownShowsBottomRowSeparator {
+    return self.contentViewController.showsBottomRowSeparator;
 }
 
 - (void)setDropdownShowsBorder:(BOOL)dropdownShowsBorder {
