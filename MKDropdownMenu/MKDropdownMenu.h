@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, weak, nonatomic) IBOutlet id<MKDropdownMenuDelegate> delegate;
 
 /// The view the dropdown to be presented in. If not specified, the dropdown will be presented in the containing window.
-@property (nullable, weak, nonatomic) UIView *presentingView;
+@property (nullable, weak, nonatomic) IBOutlet UIView *presentingView;
 
 /// If presented in scroll view, its vertical content offset will be updated to fit the dropdown. Default = NO.
 @property (assign, nonatomic) BOOL adjustsContentOffset;
