@@ -141,6 +141,7 @@ static UIImage *disclosureIndicatorImage = nil;
         [self.containerView addSubview:customView];
     }
     self.containerView.hidden = NO;
+    self.accessibilityLabel = customView.accessibilityLabel;
     [self setAttributedTitle:nil selectedTitle:nil];
 }
 
