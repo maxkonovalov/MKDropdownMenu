@@ -644,7 +644,7 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (CGFloat)contentHeight {
     return MIN(MAX(self.rowsCount * self.tableView.rowHeight, 0), self.maxHeight)
-    + self.tableView.tableHeaderView.frame.size.height;
+    + self.tableView.tableHeaderView.frame.size.height + self.tableView.tableFooterView.frame.size.height;
 }
 
 - (void)setContentInset:(UIEdgeInsets)contentInset {
@@ -703,6 +703,19 @@ static UIImage *disclosureIndicatorImage = nil;
     return self.tableView.tableHeaderView != nil;
 }
 
+- (void)setShowsBottomRowSeparator:(BOOL)showsBottomRowSeparator {
+    if (showsBottomRowSeparator) {
+        self.tableView.tableFooterView = nil;
+    } else {
+        // Adding a footer view of non-zero height prevents the last row separator from showing
+        self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0.5)];
+    }
+}
+
+- (BOOL)showsBottomRowSeparator {
+    return self.tableView.tableFooterView == nil;
+}
+
 - (void)setShowsBorder:(BOOL)showsBorder {
     self.borderView.hidden = !showsBorder;
 }
@@ -750,13 +763,9 @@ static UIImage *disclosureIndicatorImage = nil;
     
     cell.textLabel.textAlignment = self.textAlignment;
     
+    cell.preservesSuperviewLayoutMargins = NO;
     cell.layoutMargins = UIEdgeInsetsZero;
-    
-    if (!self.showsBottomRowSeparator && indexPath.row == self.rowsCount - 1) {
-        cell.separatorInset = UIEdgeInsetsMake(0, CGRectGetWidth(tableView.bounds), 0, 0);
-    } else {
-        cell.separatorInset = UIEdgeInsetsZero;
-    }
+    cell.separatorInset = UIEdgeInsetsZero;
     
     return cell;
 }
