@@ -84,6 +84,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// The rotation angle (in radians) of the disclosure indicator when the component is selected. Default = M_PI.
 @property (assign, nonatomic) CGFloat disclosureIndicatorSelectionRotation UI_APPEARANCE_SELECTOR;
 
+/// The technique to use for wrapping and truncating the component title text. Multiline title can be displayed by specifying `NSLineBreakByWordWrapping` or `NSLineBreakByCharWrapping`. Default = `NSLineBreakByTruncatingMiddle`.
+@property (assign, nonatomic) NSLineBreakMode componentLineBreakMode UI_APPEARANCE_SELECTOR;
+
 /// The alignment of the labels in header components. Default = NSTextAlignmentCenter.
 @property (assign, nonatomic) NSTextAlignment componentTextAlignment UI_APPEARANCE_SELECTOR;
 

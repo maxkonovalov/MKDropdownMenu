@@ -384,6 +384,9 @@ static UIImage *disclosureIndicatorImage = nil;
     [self.view addGestureRecognizer:tap];
     
     
+    _textAlignment = NSTextAlignmentLeft;
+    
+    
     /* Setup Views */
     
     
@@ -999,6 +1002,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     
     _selectedComponent = NSNotFound;
     
+    _componentLineBreakMode = NSLineBreakByTruncatingMiddle;
     _componentTextAlignment = NSTextAlignmentCenter;
     
     _adjustsContentInset = YES;
@@ -1067,6 +1071,17 @@ static const CGFloat kScrollViewBottomSpace = 5;
         enabled = [self.delegate dropdownMenu:self enableComponent:component];
     }
     [button setEnabled:enabled];
+    
+    button.titleLabel.lineBreakMode = self.componentLineBreakMode;
+    switch (self.componentLineBreakMode) {
+        case NSLineBreakByCharWrapping:
+        case NSLineBreakByWordWrapping:
+            button.titleLabel.numberOfLines = 0;
+            break;
+        default:
+            button.titleLabel.numberOfLines = 1;
+            break;
+    }
     
     [button setTextAlignment:self.componentTextAlignment];
     [button setDisclosureIndicatorImage:self.disclosureIndicatorImage];
@@ -1286,6 +1301,11 @@ static const CGFloat kScrollViewBottomSpace = 5;
 
 - (UIOffset)spacerViewOffset {
     return self.contentViewController.separatorViewOffset;
+}
+
+- (void)setComponentLineBreakMode:(NSLineBreakMode)componentLineBreakMode {
+    _componentLineBreakMode = componentLineBreakMode;
+    [self updateComponentButtons];
 }
 
 - (void)setComponentTextAlignment:(NSTextAlignment)componentTextAlignment {
