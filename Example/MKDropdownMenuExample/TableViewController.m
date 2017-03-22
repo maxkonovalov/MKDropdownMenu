@@ -26,6 +26,13 @@
     cell.dropdownMenu.delegate = self;
     cell.dropdownMenu.presentingView = tableView;
     cell.dropdownMenu.adjustsContentOffset = YES;
+
+    // Show above
+    BOOL showAbove = indexPath.row % 2;
+    cell.dropdownMenu.dropdownShowsContentAbove = showAbove;
+    cell.dropdownMenu.disclosureIndicatorImage = showAbove ? [UIImage new] : nil;
+
+    // reload + return
     [cell.dropdownMenu reloadAllComponents];
     return cell;
 }

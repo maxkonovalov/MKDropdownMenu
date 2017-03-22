@@ -334,6 +334,7 @@ static UIImage *disclosureIndicatorImage = nil;
 @property (strong, nonatomic) UIView *borderView;
 @property (strong, nonatomic) CAShapeLayer *borderLayer;
 @property (assign, nonatomic) BOOL showsBorder;
+@property (assign, nonatomic) BOOL showAbove;
 
 @property (strong, nonatomic) UIView *tableContainerView;
 @property (strong, nonatomic) UITableView *tableView;
@@ -811,32 +812,39 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (void)presentDropdownInContainerView:(UIView *)containerView animated:(BOOL)animated completion:(void (^)())completion {
-    
+
     self.containerView = containerView;
-    
+
     [self.controller beginAppearanceTransition:YES animated:animated];
-    
+
     CGRect frame = [containerView convertRect:self.menu.bounds fromView:self.menu];
     CGFloat topOffset = CGRectGetMaxY(frame);
     CGFloat height = CGRectGetHeight(containerView.bounds);
-    
+    CGFloat contentHeight = self.controller.contentHeight;
+
+    // dropdown's content y
+    CGFloat contentY = self.controller.showAbove
+                        ? topOffset - contentHeight - self.menu.frame.size.height
+                        : topOffset;
+
+    // Adjust scrollView + height
     void (^scrollViewAdjustBlock)() = ^{};
-    
+
     if ([containerView isKindOfClass:[UIScrollView class]]) {
         UIScrollView *scrollView = (UIScrollView *)containerView;
-        
+
         CGFloat contentHeight = self.controller.contentHeight;
         CGFloat contentMaxY = topOffset + contentHeight + kScrollViewBottomSpace;
-        
+
         CGFloat inset = contentMaxY - scrollView.contentSize.height - scrollView.contentInset.bottom;
-        CGFloat offset = contentMaxY - scrollView.bounds.size.height;
-        
+        CGFloat offset = self.controller.showAbove ? contentY : contentMaxY - scrollView.bounds.size.height;
+
         height = MAX(height - scrollView.contentInset.top, scrollView.contentSize.height + scrollView.contentInset.bottom);
-        
+
         if (_menu.adjustsContentInset) {
             height = MAX(height, contentMaxY);
         }
-        
+
         scrollViewAdjustBlock = ^{
             if (_menu.adjustsContentInset && inset > 0) {
                 _previousScrollViewBottomInset = scrollView.contentInset.bottom;
@@ -844,18 +852,21 @@ static const CGFloat kScrollViewBottomSpace = 5;
                 contentInset.bottom += inset;
                 scrollView.contentInset = contentInset;
             }
-            if (_menu.adjustsContentOffset && scrollView.contentOffset.y < offset) {
+            if (_menu.adjustsContentOffset
+                && (self.controller.showAbove ? offset < scrollView.contentOffset.y : scrollView.contentOffset.y < offset)) {
                 scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, offset);
             }
         };
     }
-    
-    self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), topOffset,
+
+    // Set frame to dropdown's content TableView
+    self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), contentY,
                                             CGRectGetWidth(containerView.bounds), height - topOffset);
-    
+
+    // Show dropdown
     [containerView addSubview:self.controller.view];
     [self.controller.view layoutIfNeeded];
-    
+
     if (!animated) {
         scrollViewAdjustBlock();
         [self.controller endAppearanceTransition];
@@ -864,15 +875,16 @@ static const CGFloat kScrollViewBottomSpace = 5;
         }
         return;
     }
-    
+
     CGAffineTransform t = CGAffineTransformMakeScale(1.0, 0.5);
-    t = CGAffineTransformTranslate(t, 0, -2 * CGRectGetHeight(self.controller.containerView.frame));
+    CGFloat tyScale = self.controller.showAbove ? 0.5 : -2;
+    t = CGAffineTransformTranslate(t, 0, tyScale * CGRectGetHeight(self.controller.containerView.frame));
     self.controller.containerView.transform = t;
-    
+
     self.controller.view.alpha = 0.0;
-    
+
     _isAnimating = YES;
-    
+
     [UIView animateWithDuration:self.duration
                           delay:0.0
          usingSpringWithDamping:1.0
@@ -889,8 +901,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
                          if (completion) {
                              completion();
                          }
-                     }];
-}
+                     }];}
 
 - (void)dismissDropdownAnimated:(BOOL)animated completion:(void (^)())completion {
     
@@ -907,6 +918,9 @@ static const CGFloat kScrollViewBottomSpace = 5;
                 scrollView.contentInset = contentInset;
                 _previousScrollViewBottomInset = CGFLOAT_MAX;
             }
+            if (_menu.adjustsContentOffset && scrollView.contentOffset.y < 0) {
+                scrollView.contentOffset = CGPointMake(scrollView.contentOffset.x, 0);
+            }
         };
     }
     
@@ -921,7 +935,8 @@ static const CGFloat kScrollViewBottomSpace = 5;
     }
     
     CGAffineTransform t = CGAffineTransformMakeScale(1.0, 0.5);
-    t = CGAffineTransformTranslate(t, 0, -2 * CGRectGetHeight(self.controller.containerView.frame));
+    CGFloat tyScale = self.controller.showAbove ? 0.5 : -2;
+    t = CGAffineTransformTranslate(t, 0, tyScale * CGRectGetHeight(self.controller.containerView.frame));
     
     _isAnimating = YES;
     
@@ -1265,6 +1280,14 @@ static const CGFloat kScrollViewBottomSpace = 5;
     return self.contentViewController.showsBorder;
 }
 
+- (void)setDropdownShowsContentAbove:(BOOL)dropdownShowsContentAbove {
+    self.contentViewController.showAbove = dropdownShowsContentAbove;
+}
+
+- (BOOL)dropdownShowsContentAbove {
+    return self.contentViewController.showAbove;
+}
+
 - (void)setBackgroundDimmingOpacity:(CGFloat)backgroundDimmingOpacity {
     self.contentViewController.view.backgroundColor = [UIColor colorWithWhite:(backgroundDimmingOpacity < 0 ? 1.0 : 0.0)
                                                                         alpha:fabs(backgroundDimmingOpacity)];
@@ -1562,7 +1585,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 #pragma mark - Dropdown Presenting & Dismissing
 
 - (UIView *)containerView {
-    return self.presentingView ? self.presentingView : self.window;
+    return self.presentingView ?: self.window;
 }
 
 - (void)presentDropdownForSelectedComponentAnimated:(BOOL)animated completion:(void (^)())completion {
