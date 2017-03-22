@@ -858,6 +858,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
             }
         };
     }
+    else if (self.controller.showAbove) topOffset = 0;
 
     // Set frame to dropdown's content TableView
     self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), contentY,
