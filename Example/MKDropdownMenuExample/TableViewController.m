@@ -27,13 +27,14 @@
     cell.dropdownMenu.presentingView = tableView;
     cell.dropdownMenu.adjustsContentOffset = YES;
 
-    // Show above
-    BOOL showAbove = indexPath.row % 2;
-    cell.dropdownMenu.dropdownShowsContentAbove = showAbove;
+    cell.dropdownMenu.dropdownShowsContentAbove = indexPath.row % 2;
     
-    // reload + return
-    [cell.dropdownMenu reloadAllComponents];
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    MenuTableViewCell *menuCell = (MenuTableViewCell *)cell;
+    [menuCell.dropdownMenu reloadAllComponents];
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {

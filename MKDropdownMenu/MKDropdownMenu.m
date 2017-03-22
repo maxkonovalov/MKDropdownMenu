@@ -454,7 +454,6 @@ static UIImage *disclosureIndicatorImage = nil;
     self.shadowView.layer.shadowColor = [[UIColor blackColor] CGColor];
     self.shadowView.layer.shadowOpacity = kShadowOpacity;
     self.shadowView.layer.shadowRadius = kDefaultCornerRadius;
-    self.shadowView.layer.shadowOffset = CGSizeMake(0, 1);
     
     
     // Separator
@@ -598,13 +597,27 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (void)updateShadow {
     UIBezierPath *shadowPath = [UIBezierPath new];
-    [shadowPath moveToPoint:CGPointMake(0, CGRectGetMinY(self.shadowView.bounds))];
-    [shadowPath addLineToPoint:CGPointMake(0, CGRectGetMaxY(self.shadowView.bounds))];
-    [shadowPath addLineToPoint:CGPointMake(CGRectGetMaxX(self.shadowView.bounds), CGRectGetMaxY(self.shadowView.bounds))];
-    [shadowPath addLineToPoint:CGPointMake(CGRectGetMaxX(self.shadowView.bounds), CGRectGetMinY(self.shadowView.bounds))];
-    [shadowPath addLineToPoint:CGPointMake(CGRectGetMidX(self.shadowView.bounds), CGRectGetMidY(self.shadowView.bounds))];
+    CGRect bounds = self.shadowView.bounds;
+    CGPoint p0 = CGPointMake(CGRectGetMidX(bounds), CGRectGetMidY(bounds));
+    CGPoint p1 = CGPointMake(CGRectGetMinX(bounds), CGRectGetMinY(bounds));
+    CGPoint p2 = CGPointMake(CGRectGetMinX(bounds), CGRectGetMaxY(bounds));
+    CGPoint p3 = CGPointMake(CGRectGetMaxX(bounds), CGRectGetMaxY(bounds));
+    CGPoint p4 = CGPointMake(CGRectGetMaxX(bounds), CGRectGetMinY(bounds));
+    [shadowPath moveToPoint:p0];
+    if (self.showAbove) {
+        [shadowPath addLineToPoint:p3];
+        [shadowPath addLineToPoint:p4];
+        [shadowPath addLineToPoint:p1];
+        [shadowPath addLineToPoint:p2];
+    } else {
+        [shadowPath addLineToPoint:p1];
+        [shadowPath addLineToPoint:p2];
+        [shadowPath addLineToPoint:p3];
+        [shadowPath addLineToPoint:p4];
+    }
     [shadowPath closePath];
     self.shadowView.layer.shadowPath = shadowPath.CGPath;
+    self.shadowView.layer.shadowOffset = CGSizeMake(0, self.showAbove ? -1 : 1);
 }
 
 - (void)updateMask {

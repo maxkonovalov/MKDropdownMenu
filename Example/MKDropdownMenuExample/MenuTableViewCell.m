@@ -16,6 +16,7 @@
     self.dropdownMenu.selectedComponentBackgroundColor = [UIColor colorWithWhite:0.93 alpha:1.0];
     self.dropdownMenu.dropdownBackgroundColor = [UIColor colorWithWhite:0.96 alpha:1.0];
     self.dropdownMenu.backgroundDimmingOpacity = 0;
+    [self layoutIfNeeded];
 }
 
 @end
