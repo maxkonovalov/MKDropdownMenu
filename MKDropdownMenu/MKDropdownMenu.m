@@ -77,6 +77,7 @@ static UIImage * MKDropdownMenuDisclosureIndicatorImage() {
 @property (assign, nonatomic) NSTextAlignment textAlignment;
 @property (strong, nonatomic) UIColor *selectedBackgroundColor;
 @property (assign, nonatomic) CGFloat disclosureIndicatorAngle;
+@property (assign, nonatomic) BOOL disclosureIndicatorFlipped;
 - (void)setAttributedTitle:(NSAttributedString *)title selectedTitle:(NSAttributedString *)selectedTitle;
 - (void)setCustomView:(UIView *)customView;
 - (void)setDisclosureIndicatorImage:(UIImage *)image;
@@ -171,6 +172,11 @@ static UIImage *disclosureIndicatorImage = nil;
     [self setNeedsLayout];
 }
 
+- (void)setDisclosureIndicatorFlipped:(BOOL)disclosureIndicatorFlipped {
+    _disclosureIndicatorFlipped = disclosureIndicatorFlipped;
+    [self setSelected:self.selected];
+}
+
 - (void)setTextAlignment:(NSTextAlignment)textAlignment {
     switch (textAlignment) {
         case NSTextAlignmentLeft:
@@ -200,7 +206,11 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (void)setSelected:(BOOL)selected {
     [super setSelected:selected];
-    self.disclosureIndicatorView.transform = CGAffineTransformMakeRotation(selected ? self.disclosureIndicatorAngle : 0.0);
+    CGFloat angle = selected ? self.disclosureIndicatorAngle : 0.0;
+    if (self.disclosureIndicatorFlipped) {
+        angle += M_PI;
+    }
+    self.disclosureIndicatorView.transform = CGAffineTransformMakeRotation(angle);
     self.backgroundColor = selected ? self.selectedBackgroundColor : nil;
 }
 
@@ -812,39 +822,39 @@ static const CGFloat kScrollViewBottomSpace = 5;
 }
 
 - (void)presentDropdownInContainerView:(UIView *)containerView animated:(BOOL)animated completion:(void (^)())completion {
-
+    
     self.containerView = containerView;
-
+    
     [self.controller beginAppearanceTransition:YES animated:animated];
-
+    
     CGRect frame = [containerView convertRect:self.menu.bounds fromView:self.menu];
     CGFloat topOffset = CGRectGetMaxY(frame);
     CGFloat height = CGRectGetHeight(containerView.bounds);
     CGFloat contentHeight = self.controller.contentHeight;
-
+    
     // dropdown's content y
     CGFloat contentY = self.controller.showAbove
-                        ? topOffset - contentHeight - self.menu.frame.size.height
-                        : topOffset;
-
+    ? topOffset - contentHeight - self.menu.frame.size.height
+    : topOffset;
+    
     // Adjust scrollView + height
     void (^scrollViewAdjustBlock)() = ^{};
-
+    
     if ([containerView isKindOfClass:[UIScrollView class]]) {
         UIScrollView *scrollView = (UIScrollView *)containerView;
-
+        
         CGFloat contentHeight = self.controller.contentHeight;
         CGFloat contentMaxY = topOffset + contentHeight + kScrollViewBottomSpace;
-
+        
         CGFloat inset = contentMaxY - scrollView.contentSize.height - scrollView.contentInset.bottom;
         CGFloat offset = self.controller.showAbove ? contentY : contentMaxY - scrollView.bounds.size.height;
-
+        
         height = MAX(height - scrollView.contentInset.top, scrollView.contentSize.height + scrollView.contentInset.bottom);
-
+        
         if (_menu.adjustsContentInset) {
             height = MAX(height, contentMaxY);
         }
-
+        
         scrollViewAdjustBlock = ^{
             if (_menu.adjustsContentInset && inset > 0) {
                 _previousScrollViewBottomInset = scrollView.contentInset.bottom;
@@ -859,15 +869,15 @@ static const CGFloat kScrollViewBottomSpace = 5;
         };
     }
     else if (self.controller.showAbove) topOffset = 0;
-
+    
     // Set frame to dropdown's content TableView
     self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), contentY,
                                             CGRectGetWidth(containerView.bounds), height - topOffset);
-
+    
     // Show dropdown
     [containerView addSubview:self.controller.view];
     [self.controller.view layoutIfNeeded];
-
+    
     if (!animated) {
         scrollViewAdjustBlock();
         [self.controller endAppearanceTransition];
@@ -876,16 +886,16 @@ static const CGFloat kScrollViewBottomSpace = 5;
         }
         return;
     }
-
+    
     CGAffineTransform t = CGAffineTransformMakeScale(1.0, 0.5);
     CGFloat tyScale = self.controller.showAbove ? 0.5 : -2;
     t = CGAffineTransformTranslate(t, 0, tyScale * CGRectGetHeight(self.controller.containerView.frame));
     self.controller.containerView.transform = t;
-
+    
     self.controller.view.alpha = 0.0;
-
+    
     _isAnimating = YES;
-
+    
     [UIView animateWithDuration:self.duration
                           delay:0.0
          usingSpringWithDamping:1.0
@@ -1103,6 +1113,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
     [button setDisclosureIndicatorImage:self.disclosureIndicatorImage];
     [button setSelectedBackgroundColor:self.selectedComponentBackgroundColor];
     [button setDisclosureIndicatorAngle:self.disclosureIndicatorSelectionRotation];
+    [button setDisclosureIndicatorFlipped:self.dropdownShowsContentAbove];
     
     UIView *customView = button.currentCustomView;
     
