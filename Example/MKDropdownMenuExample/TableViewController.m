@@ -28,6 +28,7 @@
     cell.dropdownMenu.adjustsContentOffset = YES;
 
     cell.dropdownMenu.dropdownShowsContentAbove = indexPath.row % 2;
+    cell.dropdownMenu.backgroundDimmingOpacity = 0.5;
     
     return cell;
 }
