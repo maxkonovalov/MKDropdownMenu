@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Show the border around the dropdown. Drawn in the same color as row separators. Default = NO.
 @property (assign, nonatomic) BOOL dropdownShowsBorder UI_APPEARANCE_SELECTOR;
 
-/// Show the dropdown's content above the dropdown instead of normal below. Default = NO.
+/// Show the dropdown's content above the menu instead of normal below. Default = NO.
 @property (assign, nonatomic) BOOL dropdownShowsContentAbove UI_APPEARANCE_SELECTOR;
 
 /// The strength of the screen dimming (black color) under presented dropdown. Negative values produce white dimming color instead of black. Default = 0.2.
@@ -99,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The corner radius of the dropdown. Default = 2.
 @property (assign, nonatomic) CGFloat dropdownCornerRadius UI_APPEARANCE_SELECTOR;
 
-/// The corners to be rounded in the dropdown. Default = UIRectCornerBottomLeft|UIRectCornerBottomRight.
+/// The corners to be rounded in the dropdown. If not set, the dropdown will automatically switch between `UIRectCornerBottomLeft|UIRectCornerBottomRight` for the default presentation and `UIRectCornerTopLeft|UIRectCornerTopRight` when the dropdown is shown above.
 @property (assign, nonatomic) UIRectCorner dropdownRoundedCorners UI_APPEARANCE_SELECTOR;
 
 /// If `useFullScreenWidth = YES`, the dropdown will occupy the full width of the screen for all components marked in `-dropdownMenu:shouldUseFullRowWidthForComponent:`, otherwise the width of these components will be equal to DropdownMenu's width. Default = NO.

@@ -26,10 +26,8 @@
     cell.dropdownMenu.delegate = self;
     cell.dropdownMenu.presentingView = tableView;
     cell.dropdownMenu.adjustsContentOffset = YES;
-
+    cell.dropdownMenu.backgroundDimmingOpacity = 0.05;
     cell.dropdownMenu.dropdownShowsContentAbove = indexPath.row % 2;
-    cell.dropdownMenu.backgroundDimmingOpacity = 0.5;
-    
     return cell;
 }
 
