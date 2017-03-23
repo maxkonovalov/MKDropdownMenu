@@ -333,6 +333,7 @@ static UIImage *disclosureIndicatorImage = nil;
     NSLayoutConstraint *_heightConstraint;
     NSLayoutConstraint *_topConstraint;
     NSLayoutConstraint *_leftConstraint;
+    NSLayoutConstraint *_botConstraint;
     NSLayoutConstraint *_rightConstraint;
 }
 @property (weak, nonatomic) id<MKDropdownMenuContentViewControllerDelegate> delegate;
@@ -496,17 +497,16 @@ static UIImage *disclosureIndicatorImage = nil;
     
     _heightConstraint = [NSLayoutConstraint constraintWithItem:self.tableContainerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:kDefaultRowHeight];
     [self.tableContainerView addConstraint:_heightConstraint];
-    
+
     _leftConstraint = [NSLayoutConstraint constraintWithItem:self.containerView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeading multiplier:1.0 constant:0.0];
     _rightConstraint = [NSLayoutConstraint constraintWithItem:self.view attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self.containerView attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0.0];
-    
+
     [self.view addConstraints:@[_leftConstraint, _rightConstraint,
                                 [NSLayoutConstraint constraintWithItem:self.containerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0.0]]];
-    
-    _topConstraint = [NSLayoutConstraint constraintWithItem:self.separatorContainerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:0.0];
-    
+
+    _topConstraint    = [NSLayoutConstraint constraintWithItem:self.separatorContainerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:0.0];
     [self.separatorContainerView addConstraint:_topConstraint];
-    
+
     [self.containerView addConstraints:@[[NSLayoutConstraint constraintWithItem:self.separatorContainerView
                                                                       attribute:NSLayoutAttributeLeft
                                                                       relatedBy:NSLayoutRelationEqual
@@ -524,6 +524,12 @@ static UIImage *disclosureIndicatorImage = nil;
     
     
     [self.containerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[v]|" options:kNilOptions metrics:nil views:@{@"v": self.tableContainerView}]];
+
+    // https://github.com/maxkonovalov/MKDropdownMenu/pull/22
+    _botConstraint    = [NSLayoutConstraint constraintWithItem:self.containerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0.0];
+    [self.view addConstraint:_botConstraint];
+    _botConstraint.active = NO;
+
     [self.containerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[s][v]|" options:kNilOptions metrics:nil views:@{@"s": self.separatorContainerView, @"v": self.tableContainerView}]];
     
     [self.tableContainerView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[v]|" options:kNilOptions metrics:nil views:@{@"v": self.tableView}]];
@@ -751,6 +757,13 @@ static UIImage *disclosureIndicatorImage = nil;
     return !self.borderView.hidden;
 }
 
+- (void)setShowAbove:(BOOL)showAbove
+{
+    _showAbove = showAbove;
+    _botConstraint.active = showAbove;
+    _topConstraint.active = !showAbove;
+}
+
 #pragma mark - Gestures
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -842,32 +855,35 @@ static const CGFloat kScrollViewBottomSpace = 5;
     
     CGRect frame = [containerView convertRect:self.menu.bounds fromView:self.menu];
     CGFloat topOffset = CGRectGetMaxY(frame);
-    CGFloat height = CGRectGetHeight(containerView.bounds);
     CGFloat contentHeight = self.controller.contentHeight;
-    
-    // dropdown's content y
-    CGFloat contentY = self.controller.showAbove
-    ? topOffset - contentHeight - self.menu.frame.size.height
-    : topOffset;
-    
+    CGFloat contentY = topOffset - contentHeight - self.menu.frame.size.height;
+
     // Adjust scrollView + height
+    CGFloat height = CGRectGetHeight(containerView.bounds);
     void (^scrollViewAdjustBlock)() = ^{};
-    
+
     if ([containerView isKindOfClass:[UIScrollView class]]) {
         UIScrollView *scrollView = (UIScrollView *)containerView;
-        
-        CGFloat contentHeight = self.controller.contentHeight;
+
         CGFloat contentMaxY = topOffset + contentHeight + kScrollViewBottomSpace;
-        
         CGFloat inset = contentMaxY - scrollView.contentSize.height - scrollView.contentInset.bottom;
-        CGFloat offset = self.controller.showAbove ? contentY : contentMaxY - scrollView.bounds.size.height;
-        
-        height = MAX(height - scrollView.contentInset.top, scrollView.contentSize.height + scrollView.contentInset.bottom);
-        
-        if (_menu.adjustsContentInset) {
-            height = MAX(height, contentMaxY);
+        CGFloat offset = 0;
+
+        if (self.controller.showAbove) {
+
+            height = frame.origin.y;
+            // No scroll => adjust top
+            topOffset = offset = contentY < scrollView.contentOffset.y ? contentY : scrollView.contentOffset.y;
         }
-        
+        else {
+            offset = contentMaxY - scrollView.bounds.size.height;
+            height = MAX(height - scrollView.contentInset.top, scrollView.contentSize.height + scrollView.contentInset.bottom);
+
+            if (_menu.adjustsContentInset) {
+                height = MAX(height, contentMaxY);
+            }
+        }
+
         scrollViewAdjustBlock = ^{
             if (_menu.adjustsContentInset && inset > 0) {
                 _previousScrollViewBottomInset = scrollView.contentInset.bottom;
@@ -881,10 +897,13 @@ static const CGFloat kScrollViewBottomSpace = 5;
             }
         };
     }
-    else if (self.controller.showAbove) topOffset = 0;
-    
+    else if (self.controller.showAbove) {
+        topOffset = 0;
+        height = frame.origin.y;
+    }
+
     // Set frame to dropdown's content TableView
-    self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), contentY,
+    self.controller.view.frame = CGRectMake(CGRectGetMinX(containerView.bounds), topOffset,
                                             CGRectGetWidth(containerView.bounds), height - topOffset);
     
     // Show dropdown
@@ -1556,7 +1575,8 @@ static const CGFloat kScrollViewBottomSpace = 5;
     if ([self.delegate respondsToSelector:@selector(dropdownMenu:shouldUseFullRowWidthForComponent:)]) {
         fullWidth = [self.delegate dropdownMenu:self shouldUseFullRowWidthForComponent:self.selectedComponent];
     }
-    
+
+    // L/R + Width
     CGFloat left = 0;
     CGFloat right = 0;
     
@@ -1573,7 +1593,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
         left = CGRectGetMinX(buttonFrame);
         right = CGRectGetMaxX(buttonFrame);
     }
-    
+
     return UIEdgeInsetsMake(0, left, 0, CGRectGetWidth(presentingView.bounds) - right + 0.5);
 }
 
