@@ -770,8 +770,13 @@ static UIImage *disclosureIndicatorImage = nil;
 
 - (void)setShowAbove:(BOOL)showAbove {
     _showAbove = showAbove;
-    _bottomConstraint.active = showAbove;
-    _topConstraint.active = !showAbove;
+    if (showAbove) {
+        _topConstraint.active = NO;
+        _bottomConstraint.active = YES;
+    } else {
+        _bottomConstraint.active = NO;
+        _topConstraint.active = YES;
+    }
 }
 
 #pragma mark - Gestures
