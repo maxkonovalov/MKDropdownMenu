@@ -1445,6 +1445,10 @@ static const CGFloat kScrollViewBottomSpace = 5;
     return self.contentViewController.roundedCorners;
 }
 
+- (CGSize)intrinsicContentSize {
+    return UILayoutFittingExpandedSize;
+}
+
 #pragma mark - Public Methods
 
 - (NSInteger)numberOfComponents {
