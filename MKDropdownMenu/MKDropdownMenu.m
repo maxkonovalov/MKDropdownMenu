@@ -1049,6 +1049,7 @@ static const CGFloat kScrollViewBottomSpace = 5;
 {
     self = [super initWithFrame:frame];
     if (self) {
+        self.intrinsicContentSize = frame.size;
         [self setup];
     }
     return self;
