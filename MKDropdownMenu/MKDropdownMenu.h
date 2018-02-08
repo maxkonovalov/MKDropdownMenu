@@ -33,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, weak, nonatomic) IBOutlet id<MKDropdownMenuDataSource> dataSource;
 @property (nullable, weak, nonatomic) IBOutlet id<MKDropdownMenuDelegate> delegate;
 
+@property(nonatomic, assign) CGSize intrinsicContentSize;
+
 /// The view the dropdown to be presented in. If not specified, the dropdown will be presented in the containing window.
 @property (nullable, weak, nonatomic) IBOutlet UIView *presentingView;
 
